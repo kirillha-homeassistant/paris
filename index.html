@@ -6,13 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --gold: #c5a059; --dark: #1a1a1a; --light: #ffffff; --grey: #f8f8f8; --border: #e0e0e0;
-        }
+        :root { --gold: #c5a059; --dark: #1a1a1a; --light: #ffffff; --grey: #f8f8f8; --border: #e0e0e0; }
         * { box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background: var(--light); color: var(--dark); line-height: 1.6; }
         
-        /* ШАПКА */
         header { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
             padding: 10px 5%; display: flex; justify-content: space-between; align-items: center;
@@ -21,7 +18,6 @@
         .header-brand { display: flex; align-items: center; gap: 10px; }
         .header-logo-img { height: 40px; border-radius: 5px; }
 
-        /* ГЛАВНЫЙ ЭКРАН С ТВОЕЙ ВЫВЕСКОЙ */
         .hero { 
             height: 85vh; 
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
@@ -29,40 +25,20 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; text-align: center;
             margin-top: 60px;
         }
-        .hero-box {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 40px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
+        .hero-box { background: rgba(0, 0, 0, 0.4); padding: 40px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
         .hero h1 { font-size: clamp(30px, 6vw, 60px); font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
         .btn-main { 
             margin-top: 30px; padding: 20px 45px; background: #fff; color: #000; 
-            text-decoration: none; font-weight: 800; border: none; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
         }
-        .btn-main:hover { transform: scale(1.05); background: var(--gold); color: #fff; }
+        .btn-main:hover { transform: scale(1.02); background: var(--gold); color: #fff; }
+        .btn-main:disabled { background: #ccc; color: #666; cursor: not-allowed; transform: none; }
 
-        /* СЕКЦИИ */
-        .section { padding: 60px 10%; text-align: center; }
-        .section-h { font-size: 28px; font-weight: 700; margin-bottom: 40px; text-transform: uppercase; }
-        
-        /* КАРТОЧКИ УСЛУГ */
-        .s-card { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px; margin-bottom: 12px; background: var(--grey); border-radius: 8px; transition: 0.3s;
-        }
+        .s-card { display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-bottom: 12px; background: var(--grey); border-radius: 8px; }
         .qty-btn { width: 35px; height: 35px; border: 1px solid var(--dark); background: #fff; cursor: pointer; border-radius: 50%; }
 
-        /* КОРЗИНА */
-        #cart-bar { 
-            position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; 
-            padding: 20px 10%; display: none; justify-content: space-between; align-items: center; z-index: 2001;
-        }
-        .btn-next { background: var(--gold); color: #fff; border: none; padding: 15px 30px; font-weight: 700; cursor: pointer; border-radius: 5px; }
-
-        /* КАРТА */
-        .map-section { background: #eee; padding: 40px 0; }
+        #cart-bar { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; padding: 20px 10%; display: none; justify-content: space-between; align-items: center; z-index: 2001; }
+        .y-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -70,9 +46,9 @@
     <header>
         <div class="header-brand">
             <img src="https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1" class="header-logo-img">
-            <div class="logo" style="font-weight:900;">ПАРИЖ</div>
+            <div style="font-weight:900;">ПАРИЖ</div>
         </div>
-        <div style="font-size: 11px; font-weight: 700; text-align: right;">ТРЦ АРЕНА<br>1 ЭТАЖ</div>
+        <div style="font-size: 11px; font-weight: 700; text-align: right;">ТРЦ АРЕНА (1 ЭТАЖ)</div>
     </header>
 
     <div class="hero">
@@ -80,20 +56,6 @@
             <h1>Здесь стригут клёво</h1>
             <p style="letter-spacing: 3px; font-weight: 300;">САЛОН КРАСОТЫ</p>
             <button class="btn-main" onclick="openBooking()">Записаться онлайн</button>
-        </div>
-    </div>
-
-    <section class="section">
-        <div class="section-h">Наши услуги</div>
-        <div id="services-preview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-            </div>
-    </section>
-
-    <div class="map-section section">
-        <div class="section-h">Как нас найти</div>
-        <p style="margin-bottom: 20px;">Барнаул, Павловский тракт, 188 (1 этаж)</p>
-        <div id="map" style="width:100%; height:350px;">
-            <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2a795ee99572c857cbb2ed1e8182ff7783dda036340148f4dfbf42c5e1518596&amp;width=100%25&amp;height=350&amp;lang=ru_RU&amp;scroll=true"></script>
         </div>
     </div>
 
@@ -106,27 +68,29 @@
         </div>
 
         <div id="step-form" style="display:none; max-width: 500px; margin: 0 auto;">
-            <input type="date" id="uDate" class="y-input" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd; font-family:inherit;">
-            <select id="uTime" class="y-input" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd; font-family:inherit;">
+            <label>Дата визита</label>
+            <input type="date" id="uDate" class="y-input" onchange="checkAvailability()">
+            <label>Время</label>
+            <select id="uTime" class="y-input" onchange="checkAvailability()">
                 <option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option>
                 <option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option>
                 <option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
             </select>
-            <input type="text" id="uName" placeholder="Имя" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd;">
-            <input type="tel" id="uPhone" placeholder="Телефон" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd;">
-            <textarea id="uComment" placeholder="Комментарий" style="width:100%; padding:15px; margin-bottom:15px; border:1px solid #ddd; height:80px;"></textarea>
-            <button class="btn-main" style="width:100%; background:#000; color:#fff;" onclick="finish()">Записаться</button>
+            <input type="text" id="uName" placeholder="Ваше имя" class="y-input">
+            <input type="tel" id="uPhone" placeholder="Телефон" class="y-input">
+            <textarea id="uComment" placeholder="Комментарий" class="y-input" style="height:80px;"></textarea>
+            <button id="finalBtn" class="btn-main" style="width:100%; background:#000; color:#fff;" onclick="finish()">Записаться</button>
         </div>
     </div>
 
     <div id="cart-bar">
         <div><b id="cart-count">0</b> услуг(и) выбрано</div>
-        <button class="btn-next" onclick="goToForm()">Продолжить</button>
+        <button class="btn-next" style="background:var(--gold); color:#fff; border:none; padding:15px 30px; font-weight:700; cursor:pointer;" onclick="goToForm()">Продолжить</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
@@ -174,7 +138,8 @@
                 if(document.getElementById(`qty-${i.name}`)) document.getElementById(`qty-${i.name}`).innerText = i.quantity;
             });
             document.querySelectorAll('[id^="qty-"]').forEach(el => {
-                if(!cart.find(c => `qty-${c.name}` === el.id)) el.innerText = "0";
+                const sName = el.id.replace('qty-', '');
+                if(!cart.find(c => c.name === sName)) el.innerText = "0";
             });
             document.getElementById('cart-count').innerText = total;
             document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
@@ -184,26 +149,67 @@
             document.getElementById('step-services').style.display='none';
             document.getElementById('step-form').style.display='block';
             document.getElementById('step-title').innerText = "Данные для записи";
+            document.getElementById('cart-bar').style.display = 'none';
+        };
+
+        // ПРОВЕРКА ЗАНЯТОСТИ В РЕАЛЬНОМ ВРЕМЕНИ
+        window.checkAvailability = async () => {
+            const dateVal = document.getElementById('uDate').value;
+            const timeVal = document.getElementById('uTime').value;
+            const btn = document.getElementById('finalBtn');
+
+            if (!dateVal) return;
+
+            const d = dateVal.split('-');
+            const docId = `${d[0]}_${parseInt(d[1])}_${parseInt(d[2])}_${timeVal}`;
+            
+            btn.innerText = "Проверка...";
+            btn.disabled = true;
+
+            const docSnap = await getDoc(doc(db, "appointments", docId));
+
+            if (docSnap.exists()) {
+                btn.innerText = "ЗАНЯТО НА ЭТО ВРЕМЯ";
+                btn.style.background = "#ff4444";
+                btn.disabled = true;
+            } else {
+                btn.innerText = "ЗАПИСАТЬСЯ";
+                btn.style.background = "#000";
+                btn.disabled = false;
+            }
         };
 
         window.finish = async () => {
             const dInput = document.getElementById('uDate').value;
-            if(!dInput || !document.getElementById('uName').value) return alert("Заполните дату и имя!");
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+
+            if(!dInput || !name || !phone) return alert("Пожалуйста, заполните все поля!");
+
             const d = dInput.split('-');
             const t = document.getElementById('uTime').value;
             const docId = `${d[0]}_${parseInt(d[1])}_${parseInt(d[2])}_${t}`;
             
-            await setDoc(doc(db, "appointments", docId), {
-                name: document.getElementById('uName').value,
-                phone: document.getElementById('uPhone').value,
-                services: cart,
-                comment: document.getElementById('uComment').value,
-                date: `${d[2]}.${d[1]}.${d[0]}`,
-                hour: parseInt(t),
-                timestamp: new Date()
-            });
-            alert("Запись оформлена!");
-            location.reload();
+            // Финальная проверка перед записью (на случай если кто-то успел раньше)
+            const finalCheck = await getDoc(doc(db, "appointments", docId));
+            if (finalCheck.exists()) {
+                alert("Извините, это время только что заняли!");
+                return checkAvailability();
+            }
+
+            try {
+                await setDoc(doc(db, "appointments", docId), {
+                    name: name,
+                    phone: phone,
+                    services: cart,
+                    comment: document.getElementById('uComment').value,
+                    date: `${d[2]}.${d[1]}.${d[0]}`,
+                    hour: parseInt(t),
+                    timestamp: new Date()
+                });
+                alert("Вы успешно записаны!");
+                location.reload();
+            } catch(e) { alert("Ошибка записи. Попробуйте снова."); }
         };
     </script>
 </body>
