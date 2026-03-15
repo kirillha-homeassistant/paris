@@ -7,6 +7,7 @@
     <style>
         :root { 
             --y-blue: #000; --y-bg: #ffffff; --y-grey: #8e8e93; --y-light: #f2f2f7; --y-border: #e5e5ea; 
+            --y-orange: #f39c12;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: #fff; color: #000; overflow-x: hidden; }
         
@@ -43,34 +44,21 @@
         .rev-platform-logo { margin-left: auto; width: 18px; height: 18px; opacity: 0.5; }
         .rev-text { font-size: 14px; line-height: 1.5; color: #333; margin: 0; }
 
-        /* СТРЕЛКИ */
-        .nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 44px; height: 44px; background: #000; color: #fff; border: none;
-            border-radius: 50%; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .prev-btn { left: 10px; }
-        .next-btn { right: 10px; }
-        @media (max-width: 768px) { .nav-btn { display: none; } }
-
-        /* КАРТА */
-        .map-wrapper { padding: 40px 0 0; text-align: center; border-top: 1px solid var(--y-border); }
-        .map-title { font-size: 20px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
-
         /* ОКНО ЗАПИСИ */
         #booking-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; overflow-y: auto; }
         .header { padding: 15px; border-bottom: 1px solid var(--y-border); display: flex; align-items: center; position: sticky; top: 0; background: #fff; z-index: 10; }
         .back-btn { font-size: 28px; background: none; border: none; cursor: pointer; margin-right: 15px; }
         
         .s-card { margin: 10px; border: 1px solid var(--y-border); border-radius: 12px; padding: 15px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
-        .s-card:active { background: #f2f2f7; }
+        .s-card.selected { border-color: var(--y-orange); background: #fff9f0; }
         .s-name { font-weight: 700; font-size: 15px; }
         .s-price { color: var(--y-grey); font-size: 13px; }
 
         .form-box { padding: 25px; max-width: 500px; margin: 0 auto; }
-        .y-input { width: 100%; padding: 16px; border: 1px solid var(--y-border); border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .btn-confirm { width: 100%; background: #000; color: #fff; padding: 18px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; }
+        .y-input { width: 100%; padding: 16px; border: 1px solid var(--y-border); border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; font-size: 16px; outline: none; background: #f9f9f9; }
+        .btn-confirm { width: 100%; background: #000; color: #fff; padding: 18px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        
+        .label-text { font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block; color: var(--y-grey); }
     </style>
 </head>
 <body>
@@ -85,32 +73,22 @@
         <div class="aggregator-section">
             <div class="section-title">Отзывы клиентов</div>
             <div class="slider-container">
-                <button class="nav-btn prev-btn" onclick="sideScroll(-300)">‹</button>
                 <div class="reviews-slider" id="revSlider">
                     <div class="review-card">
-                        <div class="rev-user"><div class="rev-avatar">К</div><div><b>Кристина</b><br><small>Яндекс</small></div><img src="https://yastatic.net/s3/mapsapi-forms/_/b565749f73f55050f2249e917d84878a.svg" class="rev-platform-logo"></div>
-                        <p class="rev-text">"Наращивание волос — супер! Елена мастер своего дела, капсулы совсем не чувствую."</p>
+                        <div class="rev-user"><div class="rev-avatar">К</div><div><b>Кристина</b><br><small>Яндекс</small></div></div>
+                        <p class="rev-text">"Наращивание волос — супер! Елена мастер своего дела."</p>
                     </div>
                     <div class="review-card">
-                        <div class="rev-user"><div class="rev-avatar">Д</div><div><b>Дмитрий</b><br><small>2ГИС</small></div><img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/2GIS_logo.svg" class="rev-platform-logo"></div>
-                        <p class="rev-text">"Отличная мужская стрижка. В Арене теперь хожу только сюда к Людмиле."</p>
-                    </div>
-                    <div class="review-card">
-                        <div class="rev-user"><div class="rev-avatar">А</div><div><b>Анна</b><br><small>Фламп</small></div><img src="https://profsalon.ru/system/images/154/483/original/flamp.png" class="rev-platform-logo"></div>
-                        <p class="rev-text">"Стриглась здесь первый раз, очень понравилось отношение и результат. Вернусь снова!"</p>
-                    </div>
-                    <div class="review-card">
-                        <div class="rev-user"><div class="rev-avatar">М</div><div><b>Марина</b><br><small>Яндекс</small></div><img src="https://yastatic.net/s3/mapsapi-forms/_/b565749f73f55050f2249e917d84878a.svg" class="rev-platform-logo"></div>
-                        <p class="rev-text">"Маникюр сделали очень быстро и качественно. Инструменты стерильные, мастер приятная."</p>
+                        <div class="rev-user"><div class="rev-avatar">Д</div><div><b>Дмитрий</b><br><small>2ГИС</small></div></div>
+                        <p class="rev-text">"Отличная мужская стрижка. Хожу только сюда к Людмиле."</p>
                     </div>
                 </div>
-                <button class="nav-btn next-btn" onclick="sideScroll(300)">›</button>
             </div>
         </div>
 
         <div class="map-wrapper">
             <div class="map-title">Ждем вас в ТРЦ Арена</div>
-            <div class="map-container">
+            <div id="map" style="width:100%; height:400px; background: #eee;">
                 <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2a795ee99572c857cbb2ed1e8182ff7783dda036340148f4dfbf42c5e1518596&amp;width=100%25&amp;height=400&amp;lang=ru_RU&amp;scroll=true"></script>
             </div>
         </div>
@@ -119,84 +97,136 @@
     <div id="booking-app">
         <div class="header">
             <button class="back-btn" onclick="closeBooking()">←</button>
-            <b>Выберите услугу</b>
+            <b id="header-title">Выберите услуги</b>
         </div>
+        
         <div id="step-services">
-            <div class="s-card" onclick="selectService('Мужская стрижка', '600-700 ₽')"><span class="s-name">Мужская стрижка</span><span class="s-price">600 — 700 ₽</span></div>
-            <div class="s-card" onclick="selectService('Женская стрижка', '800-1500 ₽')"><span class="s-name">Женская стрижка</span><span class="s-price">800 — 1500 ₽</span></div>
-            <div class="s-card" onclick="selectService('Детская стрижка', '500-600 ₽')"><span class="s-name">Детская стрижка</span><span class="s-price">500 — 600 ₽</span></div>
-            <div class="s-card" onclick="selectService('Маникюр', 'от 1200 ₽')"><span class="s-name">Маникюр (с покрытием)</span><span class="s-price">от 1200 ₽</span></div>
-            <div class="s-card" onclick="selectService('Наращивание волос', 'от 8000 ₽')"><span class="s-name">Наращивание волос</span><span class="s-price">от 8000 ₽</span></div>
+            <div id="services-container">
+                <p style="text-align:center; padding:20px;">Загрузка услуг...</p>
+            </div>
+            <div style="padding: 20px;">
+                <button class="btn-confirm" onclick="goToForm()">ПРОДОЛЖИТЬ</button>
+            </div>
         </div>
+
         <div id="step-form" style="display:none;" class="form-box">
-            <h2 id="selName" style="margin-top:0;"></h2>
-            <input type="text" id="uName" class="y-input" placeholder="Ваше имя">
+            <span class="label-text">Дата визита</span>
+            <input type="date" id="uDate" class="y-input">
+            
+            <span class="label-text">Ваше имя</span>
+            <input type="text" id="uName" class="y-input" placeholder="Введите имя">
+            
+            <span class="label-text">Телефон</span>
             <input type="tel" id="uPhone" class="y-input" placeholder="+7 (___) ___-__-__">
-            <button class="btn-confirm" onclick="finish()">ЗАПИСАТЬСЯ</button>
+            
+            <span class="label-text">Комментарий</span>
+            <textarea id="uComment" class="y-input" style="height: 80px;" placeholder="Ваши пожелания"></textarea>
+            
+            <button class="btn-confirm" id="finalBtn" onclick="finish()">ЗАПИСАТЬСЯ</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Твой актуальный конфиг
         const firebaseConfig = {
-            apiKey: "AIzaSyBEC71-ktl6dD5SnDQCNvnPPSdGI_YsHTA",
-            authDomain: "parisarenaonline.firebaseapp.com",
+            apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
+            appId: "1:84149021703:web:a2b75e7a9b6c4d5e",
+            messagingSenderId: "84149021703",
             projectId: "parisarenaonline",
-            storageBucket: "parisarenaonline.firebasestorage.app",
-            messagingSenderId: "991613542973",
-            appId: "1:991613542973:web:db3566587ff31f06840054"
+            storageBucket: "parisarenaonline.appspot.com",
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let currentS = '';
+        let selectedServices = [];
 
-        window.sideScroll = (v) => { document.getElementById('revSlider').scrollBy({ left: v, behavior: 'smooth' }); };
-        
-        window.openBooking = () => { 
-            document.getElementById('booking-app').style.display = 'block'; 
-            document.body.style.overflow = 'hidden'; 
+        // Загрузка услуг из Firebase
+        async function loadServices() {
+            const container = document.getElementById('services-container');
+            try {
+                const snap = await getDocs(collection(db, "services"));
+                container.innerHTML = "";
+                snap.forEach(doc => {
+                    const s = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 's-card';
+                    card.innerHTML = `<span class="s-name">${s.name}</span><span class="s-price">${s.price}</span>`;
+                    card.onclick = () => {
+                        if (selectedServices.includes(s.name)) {
+                            selectedServices = selectedServices.filter(item => item !== s.name);
+                            card.classList.remove('selected');
+                        } else {
+                            selectedServices.push(s.name);
+                            card.classList.add('selected');
+                        }
+                    };
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = "<p style='padding:20px;'>Ошибка загрузки прайса</p>";
+            }
+        }
+
+        window.openBooking = () => {
+            document.getElementById('booking-app').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            loadServices();
         };
-        
-        window.closeBooking = () => { 
+
+        window.closeBooking = () => {
             document.getElementById('booking-app').style.display = 'none';
             document.body.style.overflow = '';
             document.getElementById('step-services').style.display = 'block';
             document.getElementById('step-form').style.display = 'none';
+            document.getElementById('header-title').innerText = "Выберите услуги";
         };
 
-        window.selectService = (name, price) => {
-            currentS = name;
+        window.goToForm = () => {
+            if (selectedServices.length === 0) {
+                alert("Выберите хотя бы одну услугу!");
+                return;
+            }
             document.getElementById('step-services').style.display = 'none';
             document.getElementById('step-form').style.display = 'block';
-            document.getElementById('selName').innerText = name;
+            document.getElementById('header-title').innerText = "Данные для записи";
         };
 
         window.finish = async () => {
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
-            
-            if(!n || !p) {
-                alert("Пожалуйста, заполните имя и телефон!");
+            const d = document.getElementById('uDate').value;
+            const c = document.getElementById('uComment').value;
+
+            if (!n || !p || !d) {
+                alert("Заполните дату, имя и телефон!");
                 return;
             }
 
+            const btn = document.getElementById('finalBtn');
+            btn.innerText = "ОТПРАВКА...";
+            btn.disabled = true;
+
             try {
-                await addDoc(collection(db, "appointments"), { 
-                    service: currentS, 
-                    name: n, 
-                    phone: p, 
-                    date: new Date().toLocaleString() 
+                // Создаем документ в appointments для админки
+                await addDoc(collection(db, "appointments"), {
+                    name: n,
+                    phone: p,
+                    date: d,
+                    services: selectedServices,
+                    comment: c,
+                    status: "Новый",
+                    timestamp: new Date()
                 });
-                alert("Успешно записано! Мы скоро перезвоним.");
+                alert("Вы успешно записаны! Ждем вас в ПАРИЖЕ.");
                 closeBooking();
-                document.getElementById('uName').value = "";
-                document.getElementById('uPhone').value = "";
-            } catch(e) { 
-                console.error(e);
-                alert("Ошибка при отправке данных."); 
+                location.reload(); // Сброс полей
+            } catch (e) {
+                alert("Ошибка: " + e.message);
+                btn.innerText = "ЗАПИСАТЬСЯ";
+                btn.disabled = false;
             }
         };
     </script>
