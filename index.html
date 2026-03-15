@@ -24,16 +24,13 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            padding: 40px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px;
         }
 
         .btn-main { 
             margin-top: 20px; padding: 18px 40px; background: #fff; color: #000; 
-            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase;
         }
         .btn-main:disabled { background: #ff4444 !important; color: #fff; cursor: not-allowed; }
 
@@ -41,7 +38,11 @@
         .map-container { width: 100%; height: 350px; border-radius: 20px; overflow: hidden; margin-top: 20px; border: 1px solid #eee; }
 
         #booking-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; overflow-y: auto; padding: 80px 5% 40px 5%; }
+        
+        /* Стили для выбора услуг с количеством */
         .s-card { display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-bottom: 12px; background: #f8f8f8; border-radius: 12px; }
+        .qty-controls { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { width: 32px; height: 32px; border: 1px solid #000; background: #fff; border-radius: 50%; cursor: pointer; font-weight: 700; }
         
         #cart-bar { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; padding: 20px 10%; display: none; justify-content: space-between; align-items: center; z-index: 2001; }
         .y-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 8px; }
@@ -78,7 +79,9 @@
         </div>
 
         <div id="step-form" style="display:none; max-width: 500px; margin: 0 auto;">
+            <label>Дата визита:</label>
             <input type="date" id="uDate" class="y-input" onchange="window.checkAvailability()">
+            <label>Время:</label>
             <select id="uTime" class="y-input" onchange="window.checkAvailability()">
                 <option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option>
                 <option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option>
@@ -86,12 +89,12 @@
             </select>
             <input type="text" id="uName" placeholder="Ваше имя" class="y-input">
             <input type="tel" id="uPhone" placeholder="Телефон" class="y-input">
-            <button id="finalBtn" class="btn-main" style="width:100%; background:#000; color:#fff;" onclick="window.finish()">ПОДТВЕРДИТЬ ЗАПИСЬ</button>
+            <button id="finalBtn" class="btn-main" style="width:100%; background:#000; color:#fff;" onclick="window.finish()">ПОДТВЕРДИТЬ</button>
         </div>
     </div>
 
     <div id="cart-bar">
-        <div id="cart-count">Выбрано: 0</div>
+        <div id="cart-info">Выбрано услуг: 0</div>
         <button style="background:var(--gold); color:#fff; border:none; padding:12px 25px; font-weight:700; cursor:pointer; border-radius:8px;" onclick="window.goToForm()">ДАЛЕЕ</button>
     </div>
 
@@ -119,15 +122,32 @@
                 container.innerHTML += `
                     <div class="s-card">
                         <b>${s.name}</b>
-                        <button onclick="window.addS('${s.name}')" style="padding:8px 20px; border-radius:8px; border:1px solid #000; background:#fff; cursor:pointer;">+</button>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="window.updateQty('${s.name}', -1)">-</button>
+                            <span id="q-${s.name}">0</span>
+                            <button class="qty-btn" onclick="window.updateQty('${s.name}', 1)">+</button>
+                        </div>
                     </div>`;
             });
         };
 
-        window.addS = (name) => {
-            if(!cart.find(i => i.name === name)) cart.push({name, quantity: 1});
-            document.getElementById('cart-bar').style.display = 'flex';
-            document.getElementById('cart-count').innerText = "Выбрано услуг: " + cart.length;
+        window.updateQty = (name, delta) => {
+            let item = cart.find(i => i.name === name);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) cart = cart.filter(i => i.name !== name);
+            } else if (delta > 0) {
+                cart.push({ name, quantity: 1 });
+            }
+            
+            // Обновляем цифры на экране
+            const currentItem = cart.find(i => i.name === name);
+            document.getElementById(`q-${name}`).innerText = currentItem ? currentItem.quantity : 0;
+            
+            // Показываем/скрываем черную панель снизу
+            const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+            document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
+            document.getElementById('cart-info').innerText = "Всего услуг: " + total;
         };
 
         window.goToForm = () => {
@@ -146,7 +166,7 @@
             const p = d.split('-');
             const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
             
-            btn.innerText = "ПРОВЕРЯЕМ...";
+            btn.innerText = "ПРОВЕРКА...";
             const snap = await getDoc(doc(db, "appointments", id));
 
             if (snap.exists()) {
@@ -162,7 +182,7 @@
             const d = document.getElementById('uDate').value;
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
-            if(!d || !n || !p) return alert("Заполните всё!");
+            if(!d || !n || !p) return alert("Заполните все данные!");
 
             const pts = d.split('-');
             const t = document.getElementById('uTime').value;
@@ -172,11 +192,12 @@
                 await setDoc(doc(db, "appointments", id), {
                     name: n, phone: p, services: cart,
                     date: `${parseInt(pts[2])}.${parseInt(pts[1])}.${pts[0]}`,
-                    hour: parseInt(t)
+                    hour: parseInt(t),
+                    timestamp: new Date()
                 });
-                alert("ВЫ ЗАПИСАНЫ!");
+                alert("ВЫ УСПЕШНО ЗАПИСАНЫ!");
                 location.reload();
-            } catch (e) { alert("Ошибка: " + e.message); }
+            } catch (e) { alert("Ошибка при сохранении: " + e.message); }
         };
     </script>
 </body>
