@@ -105,113 +105,96 @@
         <button style="background:var(--gold); color:#fff; border:none; padding:15px 30px; font-weight:700; cursor:pointer; border-radius: 5px;" onclick="goToForm()">Продолжить</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
-            projectId: "parisarenaonline",
-            appId: "1:84149021703:web:a2b75e7a9b6c4d5e"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
+        projectId: "parisarenaonline",
+        appId: "1:84149021703:web:a2b75e7a9b6c4d5e"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let cart = [];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let cart = [];
 
-        window.openBooking = async () => {
-            document.getElementById('booking-app').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            const snap = await getDocs(collection(db, "services"));
-            const container = document.getElementById('services-container');
-            container.innerHTML = "";
-            snap.forEach(doc => {
-                const s = doc.data();
-                container.innerHTML += `
-                    <div class="s-card">
-                        <div><b>${s.name}</b><br><small style="color:var(--gold)">${s.price}</small></div>
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <button class="qty-btn" onclick="modifyQty('${s.name}', -1)">-</button>
-                            <span id="qty-${s.name}" style="font-weight:700;">0</span>
-                            <button class="qty-btn" onclick="modifyQty('${s.name}', 1)">+</button>
-                        </div>
-                    </div>`;
-            });
-        };
+    // ... (тут функции openBooking, modifyQty и updateUI остаются без изменений) ...
 
-        window.modifyQty = (name, delta) => {
-            let item = cart.find(i => i.name === name);
-            if (item) {
-                item.quantity += delta;
-                if (item.quantity <= 0) cart = cart.filter(i => i.name !== name);
-            } else if (delta > 0) cart.push({ name, quantity: 1 });
-            updateUI();
-        };
+    window.goToForm = () => {
+        document.getElementById('step-services').style.display='none';
+        document.getElementById('step-form').style.display='block';
+        document.getElementById('step-title').innerText = "Контактные данные";
+        document.getElementById('cart-bar').style.display = 'none';
+    };
 
-        function updateUI() {
-            let total = 0;
-            cart.forEach(i => {
-                total += i.quantity;
-                if(document.getElementById(`qty-${i.name}`)) document.getElementById(`qty-${i.name}`).innerText = i.quantity;
-            });
-            document.querySelectorAll('[id^="qty-"]').forEach(el => {
-                const sName = el.id.replace('qty-', '');
-                if(!cart.find(c => c.name === sName)) el.innerText = "0";
-            });
-            document.getElementById('cart-count').innerText = total;
-            document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
-        }
+    // ВОТ ЭТОТ БЛОК НУЖНО ВСТАВИТЬ/ЗАМЕНИТЬ:
+    window.checkAvailability = async () => {
+        const dateVal = document.getElementById('uDate').value; 
+        const timeVal = document.getElementById('uTime').value; 
+        const btn = document.getElementById('finalBtn');
 
-        window.goToForm = () => {
-            document.getElementById('step-services').style.display='none';
-            document.getElementById('step-form').style.display='block';
-            document.getElementById('step-title').innerText = "Контактные данные";
-            document.getElementById('cart-bar').style.display = 'none';
-        };
+        if (!dateVal) return;
 
-        window.checkAvailability = async () => {
-            const dateVal = document.getElementById('uDate').value;
-            const timeVal = document.getElementById('uTime').value;
-            const btn = document.getElementById('finalBtn');
-            if (!dateVal) return;
+        const parts = dateVal.split('-'); 
+        const year = parts[0];
+        const month = parseInt(parts[1]); 
+        const day = parseInt(parts[2]);   
+        
+        // Формируем ID точно как во Flutter: 2026_3_15_9
+        const docId = `${year}_${month}_${day}_${timeVal}`;
+        
+        btn.innerText = "Проверка...";
+        btn.disabled = true;
 
-            const d = dateVal.split('-');
-            const docId = `${d[0]}_${parseInt(d[1])}_${parseInt(d[2])}_${timeVal}`;
-            
-            btn.innerText = "Проверка...";
-            btn.disabled = true;
-
+        try {
             const docSnap = await getDoc(doc(db, "appointments", docId));
+
             if (docSnap.exists()) {
                 btn.innerText = "ЗАНЯТО НА ЭТО ВРЕМЯ";
-                btn.style.background = "#ff4444";
+                btn.style.backgroundColor = "#ff4444";
+                btn.disabled = true;
             } else {
                 btn.innerText = "ЗАПИСАТЬСЯ";
-                btn.style.background = "#000";
+                btn.style.backgroundColor = "#000";
                 btn.disabled = false;
             }
-        };
+        } catch (e) {
+            console.error(e);
+            btn.innerText = "ОШИБКА СЕТИ";
+            btn.disabled = false;
+        }
+    };
 
-        window.finish = async () => {
-            const dInput = document.getElementById('uDate').value;
-            const name = document.getElementById('uName').value;
-            const phone = document.getElementById('uPhone').value;
-            if(!dInput || !name || !phone) return alert("Заполните все данные!");
+    window.finish = async () => {
+        const dInput = document.getElementById('uDate').value;
+        const name = document.getElementById('uName').value;
+        const phone = document.getElementById('uPhone').value;
 
-            const d = dInput.split('-');
-            const t = document.getElementById('uTime').value;
-            const docId = `${d[0]}_${parseInt(d[1])}_${parseInt(d[2])}_${t}`;
-            
-            await setDoc(doc(db, "appointments", docId), {
-                name, phone, services: cart,
-                comment: document.getElementById('uComment').value,
-                date: `${d[2]}.${d[1]}.${d[0]}`,
-                hour: parseInt(t),
-                timestamp: new Date()
-            });
-            alert("Вы записаны!");
-            location.reload();
-        };
-    </script>
+        if(!dInput || !name || !phone) return alert("Заполните все поля!");
+
+        const parts = dInput.split('-');
+        const t = document.getElementById('uTime').value;
+        const docId = `${parts[0]}_${parseInt(parts[1])}_${parseInt(parts[2])}_${t}`;
+        
+        const finalCheck = await getDoc(doc(db, "appointments", docId));
+        if (finalCheck.exists()) {
+            alert("Это время уже заняли!");
+            return checkAvailability();
+        }
+
+        await setDoc(doc(db, "appointments", docId), {
+            name: name,
+            phone: phone,
+            services: cart,
+            comment: document.getElementById('uComment').value,
+            date: `${parseInt(parts[2])}.${parseInt(parts[1])}.${parts[0]}`,
+            hour: parseInt(t),
+            timestamp: new Date()
+        });
+        alert("Вы успешно записаны!");
+        location.reload();
+    };
+</script>
 </body>
 </html>
