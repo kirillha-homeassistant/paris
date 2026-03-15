@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --dark: #1a1a1a; --light: #ffffff; --border: #e0e0e0; }
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
         
         header { 
@@ -21,18 +21,18 @@
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), 
             url('https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1') center/cover; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; text-align: center;
-            margin-top: 60px; padding: 20px;
+            margin-top: 50px; padding: 20px;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
             padding: 25px; border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;
-            max-width: 95%;
+            max-width: 100%; width: 320px;
         }
 
         .btn-main { 
             margin-top: 15px; padding: 15px 35px; background: #fff; color: #000; 
-            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 14px;
+            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
         }
         .btn-main:disabled { background: #ff4444 !important; color: #fff; cursor: not-allowed; }
 
@@ -42,14 +42,14 @@
         #booking-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; overflow-y: auto; padding: 70px 5% 40px 5%; }
         
         .s-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; background: #f8f8f8; border-radius: 10px; font-size: 13px; }
-        .qty-controls { display: flex; align-items: center; gap: 10px; }
-        .qty-btn { width: 30px; height: 30px; border: 1px solid #000; background: #fff; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .qty-controls { display: flex; align-items: center; gap: 12px; }
+        .qty-btn { width: 32px; height: 32px; border: 1.5px solid #000; background: #fff; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         
         #cart-bar { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; padding: 15px 10%; display: none; justify-content: space-between; align-items: center; z-index: 2001; }
         
-        .form-group { text-align: left; margin-bottom: 15px; max-width: 500px; margin-left: auto; margin-right: auto; }
-        .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; display: block; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .y-input { width: 100%; padding: 12px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 8px; background: #fff; }
+        .form-group { text-align: left; margin-bottom: 15px; max-width: 500px; margin: 0 auto 15px auto; }
+        .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #999; display: block; margin-bottom: 5px; letter-spacing: 1px; }
+        .y-input { width: 100%; padding: 14px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 10px; background: #fff; }
     </style>
 </head>
 <body>
@@ -61,22 +61,22 @@
 
     <div class="hero">
         <div class="glass-card">
-            <h1 style="font-size: 28px; margin: 0; line-height: 1.2;">Здесь стригут клёво</h1>
-            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 12px;">САЛОН КРАСОТЫ</p>
+            <h1 style="font-size: 26px; margin: 0; line-height: 1.2; font-weight: 900;">ЗДЕСЬ СТРИГУТ КЛЁВО</h1>
+            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 11px;">САЛОН КРАСОТЫ</p>
             <button class="btn-main" onclick="window.openBooking()">Записаться</button>
         </div>
     </div>
 
     <section class="section">
-        <div style="font-size: 18px; font-weight: 700;">МЫ НА КАРТЕ</div>
+        <div style="font-size: 18px; font-weight: 900; letter-spacing: 1px;">МЫ НА КАРТЕ</div>
         <div class="map-container">
             <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2a795ee99572c857cbb2ed1e8182ff7783dda036340148f4dfbf42c5e1518596&amp;width=100%25&amp;height=280&amp;lang=ru_RU&amp;scroll=true"></script>
         </div>
     </section>
 
     <div id="booking-app">
-        <button onclick="location.reload()" style="position:fixed; top:15px; right:15px; font-size:24px; border:none; background:none; cursor:pointer;">✕</button>
-        <h2 id="step-title" style="text-align:center; font-size: 16px; text-transform: uppercase; margin-bottom: 20px;">Выбор услуг</h2>
+        <button onclick="location.reload()" style="position:fixed; top:15px; right:15px; font-size:28px; border:none; background:none; cursor:pointer;">✕</button>
+        <h2 id="step-title" style="text-align:center; font-size: 15px; text-transform: uppercase; margin-bottom: 25px; font-weight: 900;">Выбор услуг</h2>
         
         <div id="step-services">
             <div id="services-container"></div>
@@ -86,14 +86,14 @@
             <div class="form-group">
                 <label class="form-label">Специалист:</label>
                 <select id="uMaster" class="y-input">
-                    <option value="Любой мастер">Любой свободный мастер</option>
-                    <option value="Людмила Супонева">Людмила Супонева (парикмахер, ногтевой мастер)</option>
+                    <option value="Любой свободный">Любой свободный мастер</option>
+                    <option value="Людмила Супонева">Людмила Супонева (парикмахер, ногти)</option>
                     <option value="Елена">Елена (массажист)</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Дата:</label>
+                <label class="form-label">Дата визита:</label>
                 <input type="date" id="uDate" class="y-input" onchange="window.checkAvailability()">
             </div>
             
@@ -108,15 +108,15 @@
             
             <div class="form-group"><input type="text" id="uName" placeholder="Ваше имя" class="y-input"></div>
             <div class="form-group"><input type="tel" id="uPhone" placeholder="Телефон" class="y-input"></div>
-            <div class="form-group"><textarea id="uComment" placeholder="Комментарий" class="y-input" style="height: 70px; resize: none;"></textarea></div>
+            <div class="form-group"><textarea id="uComment" placeholder="Комментарий (необязательно)" class="y-input" style="height: 80px; resize: none;"></textarea></div>
             
-            <button id="finalBtn" class="btn-main" style="width:100%; max-width: 500px; display: block; margin: 20px auto; background:#000; color:#fff;" onclick="window.finish()">Подтвердить</button>
+            <button id="finalBtn" class="btn-main" style="width:100%; max-width: 500px; display: block; margin: 20px auto; background:#000; color:#fff;" onclick="window.finish()">Подтвердить запись</button>
         </div>
     </div>
 
     <div id="cart-bar">
-        <div id="cart-info" style="font-size: 13px;">Услуг: 0</div>
-        <button style="background:var(--gold); color:#fff; border:none; padding:10px 20px; font-weight:700; cursor:pointer; border-radius:8px; font-size: 11px;" onclick="window.goToForm()">ДАЛЕЕ</button>
+        <div id="cart-info" style="font-size: 13px; font-weight: 700;">Услуг: 0</div>
+        <button style="background:var(--gold); color:#fff; border:none; padding:10px 22px; font-weight:900; cursor:pointer; border-radius:8px; font-size: 11px; text-transform: uppercase;" onclick="window.goToForm()">ДАЛЕЕ</button>
     </div>
 
     <script type="module">
@@ -131,6 +131,11 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
+        // --- НАСТРОЙКИ TELEGRAM (ВСТАВЬ СВОИ ДАННЫЕ) ---
+        const tgToken = 'ВСТАВЬ_ТОКЕН_БОТА'; 
+        const tgChatId = 'ВСТАВЬ_ТВОЙ_ID';
+
         let cart = [];
 
         window.openBooking = async () => {
@@ -146,7 +151,7 @@
                         <b>${s.name}</b>
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="window.updateQty('${s.name}', -1)">-</button>
-                            <span id="q-${s.name}">0</span>
+                            <span id="q-${s.name}" style="font-weight:900; min-width:20px; text-align:center;">0</span>
                             <button class="qty-btn" onclick="window.updateQty('${s.name}', 1)">+</button>
                         </div>
                     </div>`;
@@ -171,7 +176,7 @@
         window.goToForm = () => {
             document.getElementById('step-services').style.display='none';
             document.getElementById('step-form').style.display='block';
-            document.getElementById('step-title').innerText = "Данные записи";
+            document.getElementById('step-title').innerText = "ДАННЫЕ ЗАПИСИ";
             document.getElementById('cart-bar').style.display = 'none';
         };
 
@@ -202,17 +207,27 @@
             const phone = document.getElementById('uPhone').value;
             const master = document.getElementById('uMaster').value;
             const comment = document.getElementById('uComment').value;
-            if(!dInput || !name || !phone) return alert("Заполните данные!");
+            if(!dInput || !name || !phone) return alert("Заполните имя и телефон!");
             const p = dInput.split('-');
             const t = document.getElementById('uTime').value;
             const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
+            
+            const dateFormatted = `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`;
+
             try {
                 await setDoc(doc(db, "appointments", id), {
                     name, phone, master, comment, services: cart,
-                    date: `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`,
-                    hour: parseInt(t), timestamp: new Date()
+                    date: dateFormatted, hour: parseInt(t), timestamp: new Date()
                 });
-                alert("ВЫ ЗАПИСАНЫ!"); location.reload();
+                
+                // УВЕДОМЛЕНИЕ В TELEGRAM
+                const sList = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+                const text = `🔔 НОВАЯ ЗАПИСЬ!\n👤 Клиент: ${name}\n📞 Тел: ${phone}\n👤 Мастер: ${master}\n🗓 Дата: ${dateFormatted} в ${t}:00\n✂️ Услуги: ${sList}\n💬 Коммент: ${comment || '-'}`;
+                
+                await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChatId}&text=${encodeURIComponent(text)}`);
+
+                alert("ВЫ УСПЕШНО ЗАПИСАНЫ!"); 
+                location.reload();
             } catch (e) { alert("Ошибка: " + e.message); }
         };
     </script>
