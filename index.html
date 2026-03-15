@@ -39,13 +39,12 @@
 
         #booking-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; overflow-y: auto; padding: 80px 5% 40px 5%; }
         
-        /* Стили для выбора услуг с количеством */
         .s-card { display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-bottom: 12px; background: #f8f8f8; border-radius: 12px; }
         .qty-controls { display: flex; align-items: center; gap: 15px; }
         .qty-btn { width: 32px; height: 32px; border: 1px solid #000; background: #fff; border-radius: 50%; cursor: pointer; font-weight: 700; }
         
         #cart-bar { position: fixed; bottom: 0; width: 100%; background: #000; color: #fff; padding: 20px 10%; display: none; justify-content: space-between; align-items: center; z-index: 2001; }
-        .y-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 8px; }
+        .y-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 8px; outline: none; }
     </style>
 </head>
 <body>
@@ -81,14 +80,19 @@
         <div id="step-form" style="display:none; max-width: 500px; margin: 0 auto;">
             <label>Дата визита:</label>
             <input type="date" id="uDate" class="y-input" onchange="window.checkAvailability()">
+            
             <label>Время:</label>
             <select id="uTime" class="y-input" onchange="window.checkAvailability()">
                 <option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option>
                 <option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option>
                 <option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
             </select>
+            
             <input type="text" id="uName" placeholder="Ваше имя" class="y-input">
             <input type="tel" id="uPhone" placeholder="Телефон" class="y-input">
+            
+            <textarea id="uComment" placeholder="Комментарий к записи" class="y-input" style="height: 100px; resize: none;"></textarea>
+            
             <button id="finalBtn" class="btn-main" style="width:100%; background:#000; color:#fff;" onclick="window.finish()">ПОДТВЕРДИТЬ</button>
         </div>
     </div>
@@ -139,12 +143,10 @@
             } else if (delta > 0) {
                 cart.push({ name, quantity: 1 });
             }
-            
-            // Обновляем цифры на экране
             const currentItem = cart.find(i => i.name === name);
-            document.getElementById(`q-${name}`).innerText = currentItem ? currentItem.quantity : 0;
-            
-            // Показываем/скрываем черную панель снизу
+            if(document.getElementById(`q-${name}`)) {
+                document.getElementById(`q-${name}`).innerText = currentItem ? currentItem.quantity : 0;
+            }
             const total = cart.reduce((sum, i) => sum + i.quantity, 0);
             document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
             document.getElementById('cart-info').innerText = "Всего услуг: " + total;
@@ -157,41 +159,62 @@
             document.getElementById('cart-bar').style.display = 'none';
         };
 
+        // ИСПРАВЛЕННАЯ ПРОВЕРКА
         window.checkAvailability = async () => {
-            const d = document.getElementById('uDate').value;
-            const t = document.getElementById('uTime').value;
+            const dateInput = document.getElementById('uDate').value;
+            const timeInput = document.getElementById('uTime').value;
             const btn = document.getElementById('finalBtn');
-            if (!d) return;
 
-            const p = d.split('-');
-            const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
+            if (!dateInput) return;
+
+            const p = dateInput.split('-');
+            // Формат ID: 2026_3_15_9 (без лишних нулей в месяце и дне)
+            const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${timeInput}`;
             
+            btn.disabled = true;
             btn.innerText = "ПРОВЕРКА...";
-            const snap = await getDoc(doc(db, "appointments", id));
 
-            if (snap.exists()) {
-                btn.innerText = "ЗАНЯТО";
-                btn.disabled = true;
-            } else {
-                btn.innerText = "ЗАПИСАТЬСЯ";
+            try {
+                const snap = await getDoc(doc(db, "appointments", id));
+                if (snap.exists()) {
+                    btn.innerText = "ВРЕМЯ ЗАНЯТО";
+                    btn.style.background = "#ff4444";
+                    btn.disabled = true;
+                } else {
+                    btn.innerText = "ПОДТВЕРДИТЬ";
+                    btn.style.background = "#000";
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                console.error("Ошибка проверки:", e);
+                btn.innerText = "ОШИБКА СЕТИ";
                 btn.disabled = false;
             }
         };
 
         window.finish = async () => {
-            const d = document.getElementById('uDate').value;
-            const n = document.getElementById('uName').value;
-            const p = document.getElementById('uPhone').value;
-            if(!d || !n || !p) return alert("Заполните все данные!");
+            const dInput = document.getElementById('uDate').value;
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+            const comment = document.getElementById('uComment').value;
 
-            const pts = d.split('-');
+            if(!dInput || !name || !phone) return alert("Пожалуйста, заполните дату, имя и телефон!");
+
+            const p = dInput.split('-');
             const t = document.getElementById('uTime').value;
-            const id = `${pts[0]}_${parseInt(pts[1])}_${parseInt(pts[2])}_${t}`;
+            const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
 
             try {
+                // Финальная проверка перед самой записью
+                const checkAgain = await getDoc(doc(db, "appointments", id));
+                if(checkAgain.exists()) return alert("Это время уже успели занять!");
+
                 await setDoc(doc(db, "appointments", id), {
-                    name: n, phone: p, services: cart,
-                    date: `${parseInt(pts[2])}.${parseInt(pts[1])}.${pts[0]}`,
+                    name, 
+                    phone, 
+                    comment, 
+                    services: cart,
+                    date: `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`,
                     hour: parseInt(t),
                     timestamp: new Date()
                 });
