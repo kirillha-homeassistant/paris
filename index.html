@@ -18,13 +18,10 @@
 
         .hero { 
             height: 55vh; 
-            /* ТА САМАЯ КАРТИНКА И ГРАДИЕНТ ДЛЯ ЧИТАЕМОСТИ ТЕКСТА */
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)), 
             url('https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1') center/cover; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            color: #ffffff; /* Текст стал белым */
-            text-align: center;
-            margin-top: 50px; padding: 20px;
+            color: #ffffff; text-align: center; margin-top: 50px; padding: 20px;
         }
 
         .glass-card {
@@ -37,8 +34,18 @@
             margin-top: 15px; padding: 15px 35px; background: #fff; color: #000; 
             font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
         }
-        /* Стили для заблокированной кнопки или мастера */
         .btn-main:disabled, select option:disabled { background: #555 !important; color: #ccc !important; cursor: not-allowed; }
+
+        /* Стили для окна успеха */
+        #success-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%;
+        }
+        .btn-tg { background: #0088cc !important; color: #fff !important; margin-bottom: 10px; }
+        .btn-close-modal { background: #eee !important; color: #333 !important; }
 
         .section { padding: 40px 10%; text-align: center; }
         .map-container { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; }
@@ -55,7 +62,7 @@
         .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #999; display: block; margin-bottom: 5px; letter-spacing: 1px; }
         .y-input { width: 100%; padding: 14px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 10px; background: #fff; }
         
-        h1, p { margin: 0; color: #ffffff; } /* Принудительно белый текст в Hero */
+        h1, p { margin: 0; color: #ffffff; }
     </style>
 </head>
 <body>
@@ -114,9 +121,18 @@
             
             <div class="form-group"><input type="text" id="uName" placeholder="Ваше имя" class="y-input"></div>
             <div class="form-group"><input type="tel" id="uPhone" placeholder="Телефон" class="y-input"></div>
-            <div class="form-group"><textarea id="uComment" placeholder="Комментарий (необязательно)" class="y-input" style="height: 80px; resize: none;"></textarea></div>
+            <div class="form-group"><textarea id="uComment" placeholder="Комментарий" class="y-input" style="height: 80px; resize: none;"></textarea></div>
             
             <button id="finalBtn" class="btn-main" style="width:100%; max-width: 500px; display: block; margin: 20px auto; background:#000; color:#fff;" onclick="window.finish()">Подтвердить запись</button>
+        </div>
+    </div>
+
+    <div id="success-modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color: #000;">Вы записаны! 🎉</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Хотите получать напоминания о визите в Telegram?</p>
+            <button id="tgLinkBtn" class="btn-main btn-tg" style="width:100%;">Включить уведомления</button>
+            <button class="btn-main btn-close-modal" style="width:100%;" onclick="location.reload()">Позже</button>
         </div>
     </div>
 
@@ -129,7 +145,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ТВОЙ КОНФИГ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
             projectId: "parisarenaonline",
@@ -139,8 +154,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // НАСТРОЙКИ БОТА
-        const botUsername = 'ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА'; // Например, ParisArenaBot без @
+        // --- НАСТРОЙКИ ---
+        const botUsername = 'ParisNotifications_Bot'; 
 
         let cart = [];
 
@@ -194,7 +209,7 @@
                     btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ";
                     btn.disabled = false;
                 }
-            } catch (e) { btn.disabled = false; btn.innerText = "ОШИБКА"; }
+            } catch (e) { btn.disabled = false; btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ"; }
         };
 
         window.finish = async () => {
@@ -203,30 +218,38 @@
             const phone = document.getElementById('uPhone').value;
             const master = document.getElementById('uMaster').value;
             const comment = document.getElementById('uComment').value;
-            if(!dInput || !name || !phone) return alert("Заполните Ваше имя и телефон!");
+
+            if(!dInput || !name || !phone) return alert("Заполните данные!");
             
             const p = dInput.split('-');
             const t = document.getElementById('uTime').value;
             const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
             const dateFormatted = `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`;
-            // ID КЛИЕНТА НА ОСНОВЕ НОМЕРА
             const clientId = phone.replace(/\D/g, ""); 
 
+            const btn = document.getElementById('finalBtn');
+            btn.disabled = true;
+            btn.innerText = "СОХРАНЕНИЕ...";
+
             try {
-                // 1. Сохраняем в базу
                 await setDoc(doc(db, "appointments", id), {
                     name, phone, master, comment, services: cart,
                     date: dateFormatted, hour: parseInt(t), 
                     clientId: clientId, timestamp: new Date().getTime()
                 });
-                
-                // 2. Уведомление на сайт (через Telegram бот мы это потом свяжем)
-                alert("Вы успешно записаны! Сейчас вы будете перенаправлены в Telegram для включения уведомлений.");
-                
-                // 3. РЕФЕРАЛЬНАЯ ССЫЛКА В БОТА С ID
-                window.location.href = `https://t.me/${botUsername}?start=${clientId}`;
 
-            } catch (e) { alert("Ошибка при записи: " + e.message); }
+                // Показываем окно вместо автоматического перехода
+                document.getElementById('success-modal').style.display = 'flex';
+                
+                document.getElementById('tgLinkBtn').onclick = () => {
+                    window.location.href = `https://t.me/${botUsername}?start=${clientId}`;
+                };
+
+            } catch (e) { 
+                alert("Ошибка: " + e.message); 
+                btn.disabled = false;
+                btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ";
+            }
         };
     </script>
 </body>
