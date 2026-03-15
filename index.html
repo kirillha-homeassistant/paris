@@ -16,27 +16,29 @@
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
         }
 
-        <style>
-    .hero { 
-        height: 50vh; 
-        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), 
-        url('https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1') center/cover; 
-        display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; text-align: center;
-        margin-top: 50px; padding: 20px;
-    }
-</style>
+        .hero { 
+            height: 55vh; 
+            /* ТА САМАЯ КАРТИНКА И ГРАДИЕНТ ДЛЯ ЧИТАЕМОСТИ ТЕКСТА */
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)), 
+            url('https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1') center/cover; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            color: #ffffff; /* Текст стал белым */
+            text-align: center;
+            margin-top: 50px; padding: 20px;
+        }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
             padding: 25px; border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;
-            max-width: 100%; width: 300px;
+            max-width: 100%; width: 320px;
         }
 
         .btn-main { 
             margin-top: 15px; padding: 15px 35px; background: #fff; color: #000; 
             font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
         }
-        .btn-main:disabled { background: #555 !important; color: #ccc !important; cursor: not-allowed; }
+        /* Стили для заблокированной кнопки или мастера */
+        .btn-main:disabled, select option:disabled { background: #555 !important; color: #ccc !important; cursor: not-allowed; }
 
         .section { padding: 40px 10%; text-align: center; }
         .map-container { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; }
@@ -52,19 +54,21 @@
         .form-group { text-align: left; margin-bottom: 15px; max-width: 500px; margin: 0 auto 15px auto; }
         .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #999; display: block; margin-bottom: 5px; letter-spacing: 1px; }
         .y-input { width: 100%; padding: 14px; border: 1px solid #ddd; font-family: inherit; font-size: 16px; border-radius: 10px; background: #fff; }
+        
+        h1, p { margin: 0; color: #ffffff; } /* Принудительно белый текст в Hero */
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-weight:900; letter-spacing: 1px;">ПАРИЖ</div>
-        <div style="font-size: 10px; font-weight: 700;">АРЕНА | 1 ЭТАЖ</div>
+        <div style="font-weight:900; letter-spacing: 1px; color: #000;">ПАРИЖ</div>
+        <div style="font-size: 10px; font-weight: 700; color: #000;">АРЕНА | 1 ЭТАЖ</div>
     </header>
 
     <div class="hero">
         <div class="glass-card">
-            <h1 style="font-size: 24px; margin: 0; line-height: 1.2; font-weight: 900;">ЗДЕСЬ СТРИГУТ КЛЁВО</h1>
-            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 10px;">САЛОН КРАСОТЫ</p>
+            <h1 style="font-size: 26px; line-height: 1.2; font-weight: 900;">ЗДЕСЬ СТРИГУТ КЛЁВО</h1>
+            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 11px; text-transform: uppercase;">САЛОН КРАСОТЫ</p>
             <button class="btn-main" onclick="window.openBooking()">Записаться</button>
         </div>
     </div>
@@ -77,7 +81,7 @@
     </section>
 
     <div id="booking-app">
-        <button onclick="location.reload()" style="position:fixed; top:15px; right:15px; font-size:28px; border:none; background:none; cursor:pointer;">✕</button>
+        <button onclick="location.reload()" style="position:fixed; top:15px; right:15px; font-size:28px; border:none; background:none; cursor:pointer; color: #000;">✕</button>
         <h2 id="step-title" style="text-align:center; font-size: 15px; text-transform: uppercase; margin-bottom: 25px; font-weight: 900;">Выбор услуг</h2>
         
         <div id="step-services">
@@ -110,7 +114,7 @@
             
             <div class="form-group"><input type="text" id="uName" placeholder="Ваше имя" class="y-input"></div>
             <div class="form-group"><input type="tel" id="uPhone" placeholder="Телефон" class="y-input"></div>
-            <div class="form-group"><textarea id="uComment" placeholder="Комментарий" class="y-input" style="height: 80px; resize: none;"></textarea></div>
+            <div class="form-group"><textarea id="uComment" placeholder="Комментарий (необязательно)" class="y-input" style="height: 80px; resize: none;"></textarea></div>
             
             <button id="finalBtn" class="btn-main" style="width:100%; max-width: 500px; display: block; margin: 20px auto; background:#000; color:#fff;" onclick="window.finish()">Подтвердить запись</button>
         </div>
@@ -125,6 +129,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // ТВОЙ КОНФИГ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
             projectId: "parisarenaonline",
@@ -134,9 +139,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // --- НАСТРОЙКИ ---
-        const tgToken = '8754615342:AAEnnlDjBL97My69PdKqFr6_1Gl9vJd5w9Q'; 
-        const botUsername = 'ParisNotifications_Bot'; // Например: ParisArenaBot (без @)
+        // НАСТРОЙКИ БОТА
+        const botUsername = 'ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА'; // Например, ParisArenaBot без @
 
         let cart = [];
 
@@ -187,10 +191,10 @@
                 if (snap.exists()) {
                     btn.innerText = "ВРЕМЯ ЗАНЯТО";
                 } else {
-                    btn.innerText = "ЗАПИСАТЬСЯ";
+                    btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ";
                     btn.disabled = false;
                 }
-            } catch (e) { btn.disabled = false; }
+            } catch (e) { btn.disabled = false; btn.innerText = "ОШИБКА"; }
         };
 
         window.finish = async () => {
@@ -199,35 +203,30 @@
             const phone = document.getElementById('uPhone').value;
             const master = document.getElementById('uMaster').value;
             const comment = document.getElementById('uComment').value;
-            if(!dInput || !name || !phone) return alert("Заполните данные!");
+            if(!dInput || !name || !phone) return alert("Заполните Ваше имя и телефон!");
             
             const p = dInput.split('-');
             const t = document.getElementById('uTime').value;
             const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
             const dateFormatted = `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`;
-            const clientId = phone.replace(/\D/g, ""); // Создаем ID из цифр номера
+            // ID КЛИЕНТА НА ОСНОВЕ НОМЕРА
+            const clientId = phone.replace(/\D/g, ""); 
 
             try {
-                // 1. Сохраняем запись в базу
+                // 1. Сохраняем в базу
                 await setDoc(doc(db, "appointments", id), {
                     name, phone, master, comment, services: cart,
                     date: dateFormatted, hour: parseInt(t), 
                     clientId: clientId, timestamp: new Date().getTime()
                 });
-
-                // 2. Уведомление мастерам и админам (делаем через твой бот)
-                const sList = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
-                const text = `✂️ НОВАЯ ЗАПИСЬ!\n👤 Мастер: ${master}\n👤 Клиент: ${name}\n📞 Тел: ${phone}\n🗓 Дата: ${dateFormatted} в ${t}:00\n✂️ Услуги: ${sList}`;
                 
-                // Ищем всех админов и мастера в Firebase через Google Script (или шлем напрямую на твой ID пока)
-                // Для простоты — шлем в Google Script на обработку (если настроен вебхук)
+                // 2. Уведомление на сайт (через Telegram бот мы это потом свяжем)
+                alert("Вы успешно записаны! Сейчас вы будете перенаправлены в Telegram для включения уведомлений.");
                 
-                alert("Вы успешно записаны! Сейчас вы будете перенаправлены в Telegram для включения напоминаний.");
-                
-                // 3. Реферальная ссылка в бота
+                // 3. РЕФЕРАЛЬНАЯ ССЫЛКА В БОТА С ID
                 window.location.href = `https://t.me/${botUsername}?start=${clientId}`;
 
-            } catch (e) { alert("Ошибка: " + e.message); }
+            } catch (e) { alert("Ошибка при записи: " + e.message); }
         };
     </script>
 </body>
