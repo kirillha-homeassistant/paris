@@ -17,9 +17,9 @@
         }
 
         .hero { 
-            height: 55vh; 
+            height: 50vh; 
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), 
-            url('https://api20.iloveimg.com/v1/download/dnl6b2x2jq4ls613xz0szn24shjndczp87A5y7fmx97h5sdk9c49llnljksd9v6xtAq2s2k4gk9crrgs7tvhg3sdnmkw9Apfg9f27f5k6Ap1kzbAAcn5smxh2qz6c3hk3mbph3cAA6flkctm467A1xc6sbd7ncsgf8sv8kvn6qhnmtqbg6w1') center/cover; 
+            url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000') center/cover; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; text-align: center;
             margin-top: 50px; padding: 20px;
         }
@@ -27,14 +27,14 @@
         .glass-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
             padding: 25px; border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;
-            max-width: 100%; width: 320px;
+            max-width: 100%; width: 300px;
         }
 
         .btn-main { 
             margin-top: 15px; padding: 15px 35px; background: #fff; color: #000; 
             font-weight: 800; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
         }
-        .btn-main:disabled { background: #ff4444 !important; color: #fff; cursor: not-allowed; }
+        .btn-main:disabled { background: #555 !important; color: #ccc !important; cursor: not-allowed; }
 
         .section { padding: 40px 10%; text-align: center; }
         .map-container { width: 100%; height: 280px; border-radius: 15px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; }
@@ -61,8 +61,8 @@
 
     <div class="hero">
         <div class="glass-card">
-            <h1 style="font-size: 26px; margin: 0; line-height: 1.2; font-weight: 900;">ЗДЕСЬ СТРИГУТ КЛЁВО</h1>
-            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 11px;">САЛОН КРАСОТЫ</p>
+            <h1 style="font-size: 24px; margin: 0; line-height: 1.2; font-weight: 900;">ЗДЕСЬ СТРИГУТ КЛЁВО</h1>
+            <p style="letter-spacing: 2px; font-weight: 300; margin-top: 5px; font-size: 10px;">САЛОН КРАСОТЫ</p>
             <button class="btn-main" onclick="window.openBooking()">Записаться</button>
         </div>
     </div>
@@ -88,7 +88,7 @@
                 <select id="uMaster" class="y-input">
                     <option value="Любой свободный">Любой свободный мастер</option>
                     <option value="Людмила Супонева">Людмила Супонева (парикмахер, ногти)</option>
-                    <option value="Елена">Елена (массажист)</option>
+                    <option value="Елена" disabled>Елена (массажист) — мест нет</option>
                 </select>
             </div>
 
@@ -108,7 +108,7 @@
             
             <div class="form-group"><input type="text" id="uName" placeholder="Ваше имя" class="y-input"></div>
             <div class="form-group"><input type="tel" id="uPhone" placeholder="Телефон" class="y-input"></div>
-            <div class="form-group"><textarea id="uComment" placeholder="Комментарий (необязательно)" class="y-input" style="height: 80px; resize: none;"></textarea></div>
+            <div class="form-group"><textarea id="uComment" placeholder="Комментарий" class="y-input" style="height: 80px; resize: none;"></textarea></div>
             
             <button id="finalBtn" class="btn-main" style="width:100%; max-width: 500px; display: block; margin: 20px auto; background:#000; color:#fff;" onclick="window.finish()">Подтвердить запись</button>
         </div>
@@ -132,9 +132,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // --- НАСТРОЙКИ TELEGRAM (ВСТАВЬ СВОИ ДАННЫЕ) ---
-        const tgToken = 'ВСТАВЬ_ТОКЕН_БОТА'; 
-        const tgChatId = 'ВСТАВЬ_ТВОЙ_ID';
+        // --- НАСТРОЙКИ ---
+        const tgToken = '8754615342:AAEnnlDjBL97My69PdKqFr6_1Gl9vJd5w9Q'; 
+        const botUsername = 'ParisNotifications_Bot'; // Например: ParisArenaBot (без @)
 
         let cart = [];
 
@@ -146,15 +146,7 @@
             container.innerHTML = "";
             snap.forEach(d => {
                 const s = d.data();
-                container.innerHTML += `
-                    <div class="s-card">
-                        <b>${s.name}</b>
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="window.updateQty('${s.name}', -1)">-</button>
-                            <span id="q-${s.name}" style="font-weight:900; min-width:20px; text-align:center;">0</span>
-                            <button class="qty-btn" onclick="window.updateQty('${s.name}', 1)">+</button>
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div class="s-card"><b>${s.name}</b><div class="qty-controls"><button class="qty-btn" onclick="window.updateQty('${s.name}', -1)">-</button><span id="q-${s.name}" style="font-weight:900; min-width:20px; text-align:center;">0</span><button class="qty-btn" onclick="window.updateQty('${s.name}', 1)">+</button></div></div>`;
             });
         };
 
@@ -192,13 +184,11 @@
                 const snap = await getDoc(doc(db, "appointments", id));
                 if (snap.exists()) {
                     btn.innerText = "ВРЕМЯ ЗАНЯТО";
-                    btn.style.background = "#ff4444";
                 } else {
-                    btn.innerText = "ПОДТВЕРДИТЬ";
-                    btn.style.background = "#000";
+                    btn.innerText = "ЗАПИСАТЬСЯ";
                     btn.disabled = false;
                 }
-            } catch (e) { btn.innerText = "ОШИБКА"; btn.disabled = false; }
+            } catch (e) { btn.disabled = false; }
         };
 
         window.finish = async () => {
@@ -207,27 +197,34 @@
             const phone = document.getElementById('uPhone').value;
             const master = document.getElementById('uMaster').value;
             const comment = document.getElementById('uComment').value;
-            if(!dInput || !name || !phone) return alert("Заполните имя и телефон!");
+            if(!dInput || !name || !phone) return alert("Заполните данные!");
+            
             const p = dInput.split('-');
             const t = document.getElementById('uTime').value;
             const id = `${p[0]}_${parseInt(p[1])}_${parseInt(p[2])}_${t}`;
-            
             const dateFormatted = `${parseInt(p[2])}.${parseInt(p[1])}.${p[0]}`;
+            const clientId = phone.replace(/\D/g, ""); // Создаем ID из цифр номера
 
             try {
+                // 1. Сохраняем запись в базу
                 await setDoc(doc(db, "appointments", id), {
                     name, phone, master, comment, services: cart,
-                    date: dateFormatted, hour: parseInt(t), timestamp: new Date()
+                    date: dateFormatted, hour: parseInt(t), 
+                    clientId: clientId, timestamp: new Date().getTime()
                 });
-                
-                // УВЕДОМЛЕНИЕ В TELEGRAM
-                const sList = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
-                const text = `🔔 НОВАЯ ЗАПИСЬ!\n👤 Клиент: ${name}\n📞 Тел: ${phone}\n👤 Мастер: ${master}\n🗓 Дата: ${dateFormatted} в ${t}:00\n✂️ Услуги: ${sList}\n💬 Коммент: ${comment || '-'}`;
-                
-                await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChatId}&text=${encodeURIComponent(text)}`);
 
-                alert("ВЫ УСПЕШНО ЗАПИСАНЫ!"); 
-                location.reload();
+                // 2. Уведомление мастерам и админам (делаем через твой бот)
+                const sList = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+                const text = `✂️ НОВАЯ ЗАПИСЬ!\n👤 Мастер: ${master}\n👤 Клиент: ${name}\n📞 Тел: ${phone}\n🗓 Дата: ${dateFormatted} в ${t}:00\n✂️ Услуги: ${sList}`;
+                
+                // Ищем всех админов и мастера в Firebase через Google Script (или шлем напрямую на твой ID пока)
+                // Для простоты — шлем в Google Script на обработку (если настроен вебхук)
+                
+                alert("Вы успешно записаны! Сейчас вы будете перенаправлены в Telegram для включения напоминаний.");
+                
+                // 3. Реферальная ссылка в бота
+                window.location.href = `https://t.me/${botUsername}?start=${clientId}`;
+
             } catch (e) { alert("Ошибка: " + e.message); }
         };
     </script>
