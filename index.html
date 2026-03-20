@@ -139,7 +139,7 @@
         <button style="background:var(--gold); color:#fff; border:none; padding:10px 22px; font-weight:900; cursor:pointer; border-radius:8px; font-size: 11px; text-transform: uppercase;" onclick="window.goToForm()">ДАЛЕЕ</button>
     </div>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -148,6 +148,135 @@
             projectId: "parisarenaonline",
             appId: "1:84149021703:web:a2b75e7a9b6c4d5e"
         };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // --- НАСТРОЙКИ ---
+        const PIPEDREAM_URL = "https://eokh9jezesm1803.m.pipedream.net/"; 
+        const botUsername = 'ParisNotifications_Bot'; 
+
+        let cart = [];
+
+        window.openBooking = async () => {
+            const bookingApp = document.getElementById('booking-app');
+            bookingApp.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Загружаем услуги из Firebase
+            const snap = await getDocs(collection(db, "services"));
+            const container = document.getElementById('services-container');
+            container.innerHTML = "";
+            snap.forEach(d => {
+                const s = d.data();
+                container.innerHTML += `
+                    <div class="s-card">
+                        <b>${s.name}</b>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="window.updateQty('${s.name}', -1)">-</button>
+                            <span id="q-${s.name}" style="font-weight:900; min-width:20px; text-align:center;">0</span>
+                            <button class="qty-btn" onclick="window.updateQty('${s.name}', 1)">+</button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.updateQty = (name, delta) => {
+            let item = cart.find(i => i.name === name);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) cart = cart.filter(i => i.name !== name);
+            } else if (delta > 0) {
+                cart.push({ name, quantity: 1 });
+            }
+            const currentItem = cart.find(i => i.name === name);
+            if(document.getElementById(`q-${name}`)) document.getElementById(`q-${name}`).innerText = currentItem ? currentItem.quantity : 0;
+            const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+            document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
+            document.getElementById('cart-info').innerText = "Всего услуг: " + total;
+        };
+
+        window.goToForm = () => {
+            document.getElementById('step-services').style.display='none';
+            // В твоем HTML нет ID step-form, но есть поля. Исправим логику заголовка:
+            document.getElementById('step-title').innerText = "ДАННЫЕ ЗАПИСИ";
+            document.getElementById('cart-bar').style.display = 'none';
+        };
+
+        window.checkAvailability = async () => {
+            const dateInput = document.getElementById('uDate').value;
+            const timeInput = document.getElementById('uTime').value;
+            const btn = document.getElementById('finalBtn');
+            if (!dateInput) return;
+            const p = dateInput.split('-');
+            const id = `${p}_${parseInt(p)}_${parseInt(p)}_${timeInput}`;
+            btn.disabled = true; btn.innerText = "ПРОВЕРКА...";
+            try {
+                const snap = await getDoc(doc(db, "appointments", id));
+                if (snap.exists()) {
+                    btn.innerText = "ВРЕМЯ ЗАНЯТО";
+                } else {
+                    btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ";
+                    btn.disabled = false;
+                }
+            } catch (e) { btn.disabled = false; btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ"; }
+        };
+
+        window.finish = async () => {
+            const dInput = document.getElementById('uDate').value;
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+            const master = document.getElementById('uMaster').value;
+            const comment = document.getElementById('uComment').value;
+            const time = document.getElementById('uTime').value;
+
+            if(!dInput || !name || !phone) return alert("Заполните данные!");
+            
+            const p = dInput.split('-');
+            const id = `${p}_${parseInt(p)}_${parseInt(p)}_${time}`;
+            const dateFormatted = `${parseInt(p)}.${parseInt(p)}.${p}`;
+            const clientId = phone.replace(/\D/g, ""); 
+
+            const btn = document.getElementById('finalBtn');
+            btn.disabled = true;
+            btn.innerText = "СОХРАНЕНИЕ...";
+
+            const orderData = {
+                name, phone, master, comment,
+                services: cart.map(i => `${i.name} (${i.quantity}x)`).join(', '),
+                date: dateFormatted, 
+                hour: parseInt(time),
+                clientId: clientId
+            };
+
+            try {
+                // 1. Сохраняем в Firebase для админки
+                await setDoc(doc(db, "appointments", id), {
+                    ...orderData,
+                    timestamp: new Date().getTime()
+                });
+
+                // 2. ОТПРАВЛЯЕМ В PIPEDREAM (для уведомлений в Telegram)
+                await fetch(PIPEDREAM_URL, {
+                    method: "POST",
+                    mode: "no-cors", // Чтобы не было проблем с CORS
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(orderData)
+                });
+
+                // 3. Показываем успех
+                document.getElementById('success-modal').style.display = 'flex';
+                document.getElementById('tgLinkBtn').onclick = () => {
+                    window.location.href = `https://t.me/${botUsername}?start=${clientId}`;
+                };
+
+            } catch (e) { 
+                alert("Ошибка: " + e.message); 
+                btn.disabled = false;
+                btn.innerText = "ПОДТВЕРДИТЬ ЗАПИСЬ";
+            }
+        };
+    </script>
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
