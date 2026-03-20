@@ -13,10 +13,10 @@
         .login-box { text-align: center; width: 300px; }
         .y-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
         
-        header { background: var(--dark); color: #fff; padding: 20px; text-align: center; font-weight: 900; letter-spacing: 2px; position: sticky; top: 0; z-index: 100; }
+        header { background: var(--dark); color: #fff; padding: 20px; text-align: center; font-weight: 900; letter-spacing: 2px; }
         
-        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 60px; z-index: 100; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 10px; font-weight: 900; cursor: pointer; color: #999; text-transform: uppercase; }
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 9px; font-weight: 900; cursor: pointer; color: #999; text-transform: uppercase; min-width: 80px; }
         .tab.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
 
         .content { flex: 1; overflow-y: auto; padding: 20px; }
@@ -24,7 +24,7 @@
         .card-title { font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
         .card-info { font-size: 12px; color: #666; margin: 8px 0; line-height: 1.4; }
         
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; margin-top: 5px; transition: 0.2s; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: white; width: 100%; }
         .btn-black { background: var(--dark); color: white; width: 100%; }
         .btn-red { background: var(--red); color: white; flex: 1; }
@@ -53,6 +53,7 @@
         <div class="tab active" onclick="switchTab('apps', this)">Записи</div>
         <div class="tab" onclick="switchTab('services', this)">Услуги</div>
         <div class="tab" onclick="switchTab('stats', this)">Отчет</div>
+        <div class="tab" id="tab-black" onclick="switchTab('black', this)" style="color: #e74c3c;">ЧС</div>
     </div>
 
     <div class="content">
@@ -75,16 +76,21 @@
             </div>
             <div id="archive-list"></div>
         </div>
+
+        <div id="section-black" style="display:none">
+            <h3 style="color:var(--red)">Заблокированные клиенты</h3>
+            <div id="black-list">Список пуст</div>
+        </div>
     </div>
 
     <div id="edit-modal">
         <div class="modal-body">
-            <h3 style="margin-top:0">Редактировать</h3>
+            <h3>Редактировать</h3>
             <input type="hidden" id="editId">
-            <input type="text" id="editName" class="y-input" placeholder="Имя">
+            <input type="text" id="editName" class="y-input">
             <input type="date" id="editDate" class="y-input">
-            <input type="number" id="editHour" class="y-input" placeholder="Час (например 14)">
-            <button class="btn btn-gold" onclick="saveEdit()">Сохранить изменения</button>
+            <input type="number" id="editHour" class="y-input">
+            <button class="btn btn-gold" onclick="saveEdit()">Сохранить</button>
             <button class="btn btn-outline" style="width:100%" onclick="document.getElementById('edit-modal').style.display='none'">Отмена</button>
         </div>
     </div>
@@ -107,11 +113,11 @@
             if (document.getElementById('passInput').value === "admin777") {
                 document.getElementById('login-screen').style.display = 'none';
                 initData();
-            } else alert("Доступ закрыт!");
+            } else alert("Ошибка пароля");
         };
 
         function initData() {
-            // Записи
+            // Записи + Кнопка Бан
             onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snap) => {
                 const list = document.getElementById('apps-list');
                 list.innerHTML = "";
@@ -120,110 +126,94 @@
                     list.innerHTML += `
                         <div class="card">
                             <div class="card-title">${a.name} <span>${a.hour}:00</span></div>
-                            <div class="card-info">
-                                📅 ${a.date}<br>
-                                📞 ${a.phone}<br>
-                                ✂️ ${a.services || 'Не указано'}<br>
-                                💬 ${a.comment || 'Нет комментария'}
-                            </div>
-                            <input type="number" id="sum-${d.id}" class="y-input" placeholder="Сумма оплаты ₽">
-                            <button class="btn btn-black" onclick="finishBooking('${d.id}')">Завершить и выдать чек</button>
+                            <div class="card-info">📞 ${a.phone}<br>📅 ${a.date}<br>✂️ ${a.services || '—'}</div>
+                            <input type="number" id="sum-${d.id}" class="y-input" placeholder="Сумма ₽">
+                            <button class="btn btn-black" onclick="finishBooking('${d.id}')">Завершить</button>
                             <div class="btn-row">
                                 <button class="btn btn-outline" onclick="openEdit('${d.id}', '${a.name}', '${a.date}', ${a.hour})">Изменить</button>
                                 <button class="btn btn-red" onclick="deleteBooking('${d.id}')">Удалить</button>
                             </div>
-                            <button class="btn btn-red" style="width:100%; opacity:0.6;" onclick="banUser('${a.clientId}', '${a.name}')">В БАН</button>
+                            <button class="btn btn-red" style="width:100%; margin-top:10px; opacity:0.8" onclick="banUser('${a.clientId}', '${a.name}')">В БАН</button>
                         </div>`;
                 });
             });
 
-            // Услуги
-            onSnapshot(collection(db, "services"), (snap) => {
-                const list = document.getElementById('services-list');
+            // Черный список (Рендеринг вкладки)
+            onSnapshot(collection(db, "blacklist"), (snap) => {
+                const list = document.getElementById('black-list');
                 list.innerHTML = "";
+                if(snap.empty) list.innerHTML = "В черном списке пока никого нет.";
                 snap.forEach(d => {
-                    list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <b>${d.data().name}</b>
-                        <button class="btn btn-red" style="padding:5px 10px" onclick="deleteService('${d.id}')">✕</button>
-                    </div>`;
+                    const b = d.data();
+                    list.innerHTML += `
+                        <div class="card" style="border-left: 5px solid var(--red)">
+                            <div class="card-title">${b.name}</div>
+                            <div class="card-info">ID: ${d.id}<br>Дата бана: ${b.date}</div>
+                            <button class="btn btn-outline" style="width:100%; color:var(--red)" onclick="unbanUser('${d.id}')">РАЗБЛОКИРОВАТЬ</button>
+                        </div>`;
                 });
             });
 
-            // Выручка
-            onSnapshot(collection(db, "archive"), (snap) => {
-                let total = 0;
-                const list = document.getElementById('archive-list');
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const a = d.data();
-                    total += Number(a.finalPrice || 0);
-                    list.innerHTML += `<div class="card" style="opacity:0.7; font-size:11px;">${a.date} | ${a.name} | <b>${a.finalPrice} ₽</b></div>`;
-                });
-                document.getElementById('total-rev').innerText = total + " ₽";
+            // Услуги и Отчеты (как в прошлом коде)
+            onSnapshot(collection(db, "services"), (s) => {
+                const l = document.getElementById('services-list'); l.innerHTML = "";
+                s.forEach(d => l.innerHTML += `<div class="card" style="display:flex; justify-content:space-between"><b>${d.data().name}</b><button class="btn btn-red" style="padding:5px" onclick="deleteService('${d.id}')">✕</button></div>`);
+            });
+            onSnapshot(collection(db, "archive"), (s) => {
+                let t = 0; const l = document.getElementById('archive-list'); l.innerHTML = "";
+                s.forEach(d => { t += Number(d.data().finalPrice); l.innerHTML += `<div class="card" style="font-size:11px">${d.data().name}: ${d.data().finalPrice}₽</div>`});
+                document.getElementById('total-rev').innerText = t + " ₽";
             });
         }
 
-        // --- ЛОГИКА ДЕЙСТВИЙ ---
-
-        window.finishBooking = async (id) => {
-            const sum = document.getElementById(`sum-${id}`).value;
-            if(!sum) return alert("Введите итоговую сумму!");
-            const docRef = doc(db, "appointments", id);
-            const snap = await getDoc(docRef);
-            const data = snap.data();
-
-            // В архив и удаляем
-            await setDoc(doc(db, "archive", id), { ...data, finalPrice: sum, status: "completed" });
-            await deleteDoc(docRef);
-
-            // Шлем чек через Pipedream
-            await fetch(PIPEDREAM_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "complete_order", customerChatId: data.clientId, price: sum })
-            });
-            alert("Готово! Чек отправлен клиенту.");
-        };
-
-        window.addService = async () => {
-            const name = document.getElementById('newServiceName').value;
-            if(!name) return;
-            await setDoc(doc(db, "services", "s_" + Date.now()), { name });
-            document.getElementById('newServiceName').value = "";
-        };
-
-        window.deleteService = async (id) => { if(confirm("Удалить услугу из прайса?")) await deleteDoc(doc(db, "services", id)); };
-
-        window.deleteBooking = async (id) => { if(confirm("Отменить запись клиента?")) await deleteDoc(doc(db, "appointments", id)); };
-
+        // --- ЛОГИКА БАНА ---
         window.banUser = async (clientId, name) => {
-            if(confirm(`ЗАБАНИТЬ клиента ${name}? Он больше не сможет пользоваться ботом.`)) {
+            if(!clientId || clientId === "undefined") return alert("ID клиента не найден. Бан возможен только для тех, кто писал боту.");
+            if(confirm(`ЗАБАНИТЬ ${name}?`)) {
                 await setDoc(doc(db, "blacklist", clientId), { name, date: new Date().toLocaleDateString() });
-                alert("Клиент заблокирован.");
+                alert("Клиент заблокирован в боте.");
             }
         };
 
-        window.openEdit = (id, name, date, hour) => {
-            document.getElementById('editId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editDate').value = date;
-            document.getElementById('editHour').value = hour;
-            document.getElementById('edit-modal').style.display = 'flex';
+        window.unbanUser = async (id) => {
+            if(confirm("Разблокировать клиента?")) {
+                await deleteDoc(doc(db, "blacklist", id));
+                alert("Доступ восстановлен.");
+            }
         };
 
+        // Остальные функции (сохранение, удаление, оплата)
+        window.finishBooking = async (id) => {
+            const sum = document.getElementById(`sum-${id}`).value;
+            if(!sum) return alert("Введите сумму!");
+            const snap = await getDoc(doc(db, "appointments", id));
+            const data = snap.data();
+            await setDoc(doc(db, "archive", id), { ...data, finalPrice: sum });
+            await deleteDoc(doc(db, "appointments", id));
+            await fetch(PIPEDREAM_URL, { method: "POST", body: JSON.stringify({ action: "complete_order", customerChatId: data.clientId, price: sum }) });
+            alert("Запись завершена!");
+        };
+
+        window.addService = async () => {
+            const n = document.getElementById('newServiceName').value;
+            if(n) { await setDoc(doc(db, "services", "s_"+Date.now()), {name:n}); document.getElementById('newServiceName').value=""; }
+        };
+        window.deleteService = async (id) => { if(confirm("Удалить?")) await deleteDoc(doc(db, "services", id)); };
+        window.deleteBooking = async (id) => { if(confirm("Удалить запись?")) await deleteDoc(doc(db, "appointments", id)); };
+        window.openEdit = (id, n, d, h) => { 
+            document.getElementById('editId').value=id; document.getElementById('editName').value=n;
+            document.getElementById('editDate').value=d; document.getElementById('editHour').value=h;
+            document.getElementById('edit-modal').style.display='flex'; 
+        };
         window.saveEdit = async () => {
             const id = document.getElementById('editId').value;
-            await updateDoc(doc(db, "appointments", id), {
-                name: document.getElementById('editName').value,
-                date: document.getElementById('editDate').value,
-                hour: Number(document.getElementById('editHour').value)
-            });
-            document.getElementById('edit-modal').style.display = 'none';
+            await updateDoc(doc(db, "appointments", id), { name: document.getElementById('editName').value, date: document.getElementById('editDate').value, hour: Number(document.getElementById('editHour').value) });
+            document.getElementById('edit-modal').style.display='none';
         };
-
         window.switchTab = (target, el) => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            ['apps', 'services', 'stats'].forEach(s => document.getElementById('section-' + s).style.display = s === target ? 'block' : 'none');
+            ['apps', 'services', 'stats', 'black'].forEach(s => document.getElementById('section-' + s).style.display = s === target ? 'block' : 'none');
         };
     </script>
 </body>
