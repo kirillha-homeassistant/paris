@@ -1,62 +1,92 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <title>PARIS | Dual Admin</title>
+    <title>PARIS | Extreme Admin</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --dark: #000; --red: #e74c3c; --bg: #f4f6f9; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); margin: 0; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; }
-        .login-box { text-align: center; width: 300px; }
-        header { background: var(--dark); color: #fff; padding: 20px; text-align: center; font-weight: 900; }
-        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 10px; font-weight: 900; cursor: pointer; color: #999; }
+        header { background: var(--dark); color: #fff; padding: 15px; text-align: center; font-weight: 900; position: sticky; top: 0; z-index: 100; }
+        
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; overflow-x: auto; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 9px; font-weight: 900; cursor: pointer; color: #999; text-transform: uppercase; min-width: 80px; }
         .tab.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
-        .content { padding: 20px; }
-        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid transparent; }
-        .card-rtdb { border-left-color: #4facfe; } /* Синяя полоска для Realtime */
-        .card-fs { border-left-color: #ff9d00; }   /* Оранжевая полоска для Firestore */
-        .badge { font-size: 8px; padding: 2px 5px; border-radius: 4px; color: white; float: right; }
-        .y-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; }
+
+        .content { padding: 15px; }
+        .card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); position: relative; border-left: 4px solid #ddd; }
+        .card-rtdb { border-left-color: #4facfe; }
+        .card-fs { border-left-color: #ff9d00; }
+        
+        .y-input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
+        .btn { padding: 10px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; width: 100%; font-size: 11px; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: white; }
         .btn-red { background: var(--red); color: white; }
+        .btn-outline { background: none; border: 1px solid #ddd; color: #666; }
+        
+        #edit-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center; }
+        .modal-body { background:white; padding:20px; border-radius:15px; width:90%; max-width:350px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-box">
-            <h2>PARIS CONTROL</h2>
-            <input type="password" id="passInput" class="y-input" placeholder="Пароль" style="background:#222; color:white;">
+        <div class="login-box" style="text-align:center">
+            <h2>PARIS ADMIN</h2>
+            <input type="password" id="passInput" class="y-input" placeholder="Пароль" style="background:#222;color:white;border:none">
             <button class="btn btn-gold" onclick="checkLogin()">ВОЙТИ</button>
         </div>
     </div>
 
-    <header>PARIS SYSTEM</header>
+    <header>PARIS CONTROL SYSTEM</header>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('apps', this)">Все Записи</div>
+        <div class="tab active" onclick="switchTab('apps', this)">Записи</div>
         <div class="tab" onclick="switchTab('services', this)">Прайс</div>
+        <div class="tab" onclick="switchTab('reviews', this)">Отзывы</div>
+        <div class="tab" onclick="switchTab('black', this)" style="color:var(--red)">ЧС</div>
     </div>
 
     <div class="content">
         <div id="section-apps">
-            <div id="apps-list">Подключение к базам...</div>
+            <div id="apps-list">Подключение...</div>
         </div>
+
         <div id="section-services" style="display:none">
-            <input type="text" id="newService" class="y-input" placeholder="Название услуги">
-            <button class="btn btn-gold" onclick="addService()">Добавить</button>
-            <div id="services-list" style="margin-top:20px"></div>
+            <div class="card">
+                <input type="text" id="newService" class="y-input" placeholder="Название услуги">
+                <button class="btn btn-gold" onclick="addService()">Добавить</button>
+            </div>
+            <div id="services-list"></div>
+        </div>
+
+        <div id="section-reviews" style="display:none">
+            <div id="reviews-list">Отзывов пока нет</div>
+        </div>
+
+        <div id="section-black" style="display:none">
+            <div id="black-list">Никто не забанен</div>
+        </div>
+    </div>
+
+    <div id="edit-modal">
+        <div class="modal-body">
+            <h3>Изменить запись</h3>
+            <input type="hidden" id="editId"><input type="hidden" id="editType">
+            <input type="text" id="editName" class="y-input" placeholder="Имя">
+            <input type="date" id="editDate" class="y-input">
+            <input type="number" id="editHour" class="y-input" placeholder="Час">
+            <button class="btn btn-gold" onclick="saveEdit()">Сохранить</button>
+            <button class="btn btn-outline" onclick="document.getElementById('edit-modal').style.display='none'">Отмена</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, remove, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getDatabase, ref, onValue, remove, set, push, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getFirestore, collection, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
@@ -69,84 +99,85 @@
         const fs = getFirestore(app);
 
         window.checkLogin = () => {
-            if (document.getElementById('passInput').value === "admin777") {
-                document.getElementById('login-screen').style.display = 'none';
-                startSync();
-            } else alert("Доступ запрещен!");
+            if(document.getElementById('passInput').value === "admin777") {
+                document.getElementById('login-screen').style.display='none';
+                init();
+            } else alert("Неверный пароль!");
         };
 
-        function startSync() {
-            const list = document.getElementById('apps-list');
-            let rtdbApps = {};
-            let fsApps = {};
-
-            const renderAll = () => {
-                list.innerHTML = "";
-                // Рендерим из Realtime
-                for (let id in rtdbApps) {
-                    const a = rtdbApps[id];
-                    list.innerHTML += createCard(id, a, 'RTDB', 'card-rtdb');
-                }
-                // Рендерим из Firestore
-                for (let id in fsApps) {
-                    const a = fsApps[id];
-                    list.innerHTML += createCard(id, a, 'FIRESTORE', 'card-fs');
-                }
+        function init() {
+            // 1. ЗАПИСИ (Dual-Sync)
+            let rApps = {}, fApps = {};
+            const draw = () => {
+                const list = document.getElementById('apps-list'); list.innerHTML = "";
+                const render = (id, a, type, cls) => {
+                    list.innerHTML += `<div class="card ${cls}">
+                        <small style="float:right">${type}</small>
+                        <b>${a.name}</b> [${a.hour}:00]<br>
+                        <small>📅 ${a.date} | 📞 ${a.phone}</small><br>
+                        <div style="display:flex;gap:5px;margin-top:8px">
+                            <button class="btn btn-gold" onclick="openEdit('${id}','${type}','${a.name}','${a.date}',${a.hour})">📝</button>
+                            <button class="btn btn-red" onclick="delAny('${id}','${type}')">🗑️</button>
+                            <button class="btn btn-outline" onclick="banUser('${a.clientId}','${a.name}')">🚫</button>
+                        </div>
+                    </div>`;
+                };
+                for(let k in rApps) render(k, rApps[k], 'RTDB', 'card-rtdb');
+                for(let k in fApps) render(k, fApps[k], 'FS', 'card-fs');
             };
+            onValue(ref(rtdb, 'appointments'), s => { rApps = s.val() || {}; draw(); });
+            onSnapshot(collection(fs, "appointments"), s => { fApps = {}; s.forEach(d => fApps[d.id] = d.data()); draw(); });
 
-            const createCard = (id, a, type, cls) => `
-                <div class="card ${cls}">
-                    <span class="badge" style="background:${type==='RTDB'?'#4facfe':'#ff9d00'}">${type}</span>
-                    <b>${a.name || 'Клиент'}</b> [${a.hour}:00]
-                    <div style="font-size:12px; margin:10px 0;">
-                        📅 ${a.date} | 📞 ${a.phone}<br>✂️ ${a.services || '-'}
-                    </div>
-                    <button class="btn btn-red" onclick="deleteAny('${id}', '${type}')">Удалить</button>
-                </div>`;
-
-            // Слушаем Realtime
-            onValue(ref(rtdb, 'appointments'), (snap) => {
-                rtdbApps = snap.val() || {};
-                renderAll();
+            // 2. УСЛУГИ
+            onValue(ref(rtdb, 'services'), s => {
+                const sl = document.getElementById('services-list'); sl.innerHTML = "";
+                const d = s.val(); for(let k in d) sl.innerHTML += `<div class="card">${d[k].name} <span style="float:right;color:red" onclick="delServ('${k}')">✕</span></div>`;
             });
 
-            // Слушаем Firestore
-            onSnapshot(collection(fs, "appointments"), (snap) => {
-                fsApps = {};
-                snap.forEach(d => fsApps[d.id] = d.data());
-                renderAll();
+            // 3. ОТЗЫВЫ (Из Realtime)
+            onValue(ref(rtdb, 'reviews'), s => {
+                const rl = document.getElementById('reviews-list'); rl.innerHTML = "";
+                const d = s.val(); if(!d) rl.innerHTML = "Нет отзывов";
+                for(let k in d) rl.innerHTML += `<div class="card"><b>${d[k].user}:</b> ${d[k].text} <button class="btn btn-red" style="width:30px;float:right" onclick="delRev('${k}')">✕</button></div>`;
             });
 
-            // Слушаем Услуги (из Realtime)
-            onValue(ref(rtdb, 'services'), (snap) => {
-                const sList = document.getElementById('services-list');
-                sList.innerHTML = "";
-                const data = snap.val();
-                for (let id in data) {
-                    sList.innerHTML += `<div class="card">${data[id].name} <span style="float:right;color:red;cursor:pointer" onclick="deleteService('${id}')">✕</span></div>`;
-                }
+            // 4. ЧЕРНЫЙ СПИСОК
+            onValue(ref(rtdb, 'blacklist'), s => {
+                const bl = document.getElementById('black-list'); bl.innerHTML = "";
+                const d = s.val(); for(let k in d) bl.innerHTML += `<div class="card">${d[k].name} (ID: ${k}) <button class="btn btn-outline" onclick="unban('${k}')">Разбанить</button></div>`;
             });
         }
 
-        window.deleteAny = async (id, type) => {
-            if(!confirm("Удалить запись?")) return;
-            if(type === 'RTDB') await remove(ref(rtdb, 'appointments/' + id));
-            else await deleteDoc(doc(fs, "appointments", id));
+        // --- ФУНКЦИИ УПРАВЛЕНИЯ ---
+        window.delAny = async (id, type) => { if(confirm("Удалить?")) type==='RTDB' ? remove(ref(rtdb, 'appointments/'+id)) : await deleteDoc(doc(fs,"appointments",id)); };
+        window.delServ = (id) => remove(ref(rtdb, 'services/'+id));
+        window.delRev = (id) => remove(ref(rtdb, 'reviews/'+id));
+        window.unban = (id) => remove(ref(rtdb, 'blacklist/'+id));
+        window.addService = () => { const n = document.getElementById('newService').value; if(n) push(ref(rtdb, 'services'), {name:n}); document.getElementById('newService').value=""; };
+
+        window.banUser = (uid, name) => {
+            if(!uid || uid === "undefined") return alert("Клиент не привязан к боту!");
+            set(ref(rtdb, 'blacklist/'+uid), {name, date: new Date().toLocaleDateString()});
+            alert("Забанен!");
         };
 
-        window.addService = () => {
-            const name = document.getElementById('newService').value;
-            if(name) push(ref(rtdb, 'services'), { name });
-            document.getElementById('newService').value = "";
+        window.openEdit = (id, type, name, date, hour) => {
+            document.getElementById('editId').value=id; document.getElementById('editType').value=type;
+            document.getElementById('editName').value=name; document.getElementById('editDate').value=date;
+            document.getElementById('editHour').value=hour; document.getElementById('edit-modal').style.display='flex';
         };
-        
-        window.deleteService = (id) => remove(ref(rtdb, 'services/' + id));
+
+        window.saveEdit = async () => {
+            const id = document.getElementById('editId').value; const type = document.getElementById('editType').value;
+            const up = { name: document.getElementById('editName').value, date: document.getElementById('editDate').value, hour: Number(document.getElementById('editHour').value) };
+            if(type==='RTDB') await update(ref(rtdb, 'appointments/'+id), up);
+            else await updateDoc(doc(fs, "appointments", id), up);
+            document.getElementById('edit-modal').style.display='none';
+        };
 
         window.switchTab = (t, el) => {
-            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('section-apps').style.display = t === 'apps' ? 'block' : 'none';
-            document.getElementById('section-services').style.display = t === 'services' ? 'block' : 'none';
+            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); el.classList.add('active');
+            ['apps','services','reviews','black'].forEach(s => document.getElementById('section-'+s).style.display = s===t?'block':'none');
         };
     </script>
 </body>
