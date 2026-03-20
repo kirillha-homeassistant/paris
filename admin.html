@@ -1,40 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <title>PARIS | Admin Panel</title>
+    <title>PARIS | Admin Realtime</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --dark: #000; --red: #e74c3c; --bg: #f4f6f9; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); margin: 0; }
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; }
         .login-box { text-align: center; width: 300px; }
         .y-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        
         header { background: var(--dark); color: #fff; padding: 20px; text-align: center; font-weight: 900; letter-spacing: 2px; }
-        
-        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 9px; font-weight: 900; cursor: pointer; color: #999; text-transform: uppercase; min-width: 80px; }
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; sticky: top; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 10px; font-weight: 900; cursor: pointer; color: #999; }
         .tab.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
-
-        .content { flex: 1; overflow-y: auto; padding: 20px; }
+        .content { padding: 20px; }
         .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .card-title { font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .card-info { font-size: 12px; color: #666; margin: 8px 0; line-height: 1.4; }
-        
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; margin-top: 5px; }
-        .btn-gold { background: var(--gold); color: white; width: 100%; }
-        .btn-black { background: var(--dark); color: white; width: 100%; }
-        .btn-red { background: var(--red); color: white; flex: 1; }
-        .btn-outline { background: none; border: 1.5px solid #ddd; color: #666; flex: 1; }
-
-        .btn-row { display: flex; gap: 8px; margin-top: 10px; }
-        .stats-box { background: var(--dark); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; text-align: center; }
-        
-        #edit-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center; }
-        .modal-body { background:white; padding:25px; border-radius:20px; width:90%; max-width:400px; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; }
+        .btn-gold { background: var(--gold); color: white; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-outline { background: none; border: 1.5px solid #ddd; color: #666; }
     </style>
 </head>
 <body>
@@ -42,7 +28,7 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>PARIS ADMIN</h2>
-            <input type="password" id="passInput" class="y-input" placeholder="Пароль" style="background:#222; color:white; border:none;">
+            <input type="password" id="passInput" class="y-input" placeholder="Пароль">
             <button class="btn btn-gold" onclick="checkLogin()">ВОЙТИ</button>
         </div>
     </div>
@@ -52,190 +38,120 @@
     <div class="tabs">
         <div class="tab active" onclick="switchTab('apps', this)">Записи</div>
         <div class="tab" onclick="switchTab('services', this)">Услуги</div>
-        <div class="tab" onclick="switchTab('stats', this)">Отчет</div>
-        <div class="tab" id="tab-black" onclick="switchTab('black', this)" style="color: #e74c3c;">ЧС</div>
+        <div class="tab" onclick="switchTab('black', this)">ЧС</div>
     </div>
 
     <div class="content">
         <div id="section-apps">
-            <div id="apps-list">Загрузка данных...</div>
+            <div id="apps-list">Загрузка данных из Realtime DB...</div>
         </div>
-
         <div id="section-services" style="display:none">
             <div class="card">
-                <input type="text" id="newServiceName" class="y-input" placeholder="Название новой услуги">
-                <button class="btn btn-gold" onclick="addService()">Добавить в прайс</button>
+                <input type="text" id="newService" class="y-input" placeholder="Название услуги">
+                <button class="btn btn-gold" onclick="addService()">Добавить</button>
             </div>
             <div id="services-list"></div>
         </div>
-
-        <div id="section-stats" style="display:none">
-            <div class="stats-box">
-                <div style="font-size: 11px; opacity: 0.6; margin-bottom: 5px;">ОБЩАЯ ВЫРУЧКА</div>
-                <div id="total-rev" style="font-size: 32px; font-weight: 900; color: var(--gold);">0 ₽</div>
-            </div>
-            <div id="archive-list"></div>
-        </div>
-
         <div id="section-black" style="display:none">
-            <h3 style="color:var(--red)">Заблокированные клиенты</h3>
-            <div id="black-list">Список пуст</div>
-        </div>
-    </div>
-
-    <div id="edit-modal">
-        <div class="modal-body">
-            <h3>Редактировать</h3>
-            <input type="hidden" id="editId">
-            <input type="text" id="editName" class="y-input">
-            <input type="date" id="editDate" class="y-input">
-            <input type="number" id="editHour" class="y-input">
-            <button class="btn btn-gold" onclick="saveEdit()">Сохранить</button>
-            <button class="btn btn-outline" style="width:100%" onclick="document.getElementById('edit-modal').style.display='none'">Отмена</button>
+            <div id="black-list"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getDatabase, ref, onValue, set, remove, push, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // ТВОИ НАСТРОЙКИ (проверь projectId и URL базы)
         const firebaseConfig = {
-            apiKey: "AIzaSyDE-ZzO_39S-TshO8u36M7_W_E9qM",
-            projectId: "parisarenaonline",
-            appId: "1:84149021703:web:a2b75e7a9b6c4d5e"
+            databaseURL: "https://parisarenaonline-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "parisarenaonline"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const PIPEDREAM_URL = "https://eokh9jezesm1803.m.pipedream.net/";
+        const db = getDatabase(app);
 
+        // ВХОД
         window.checkLogin = () => {
-            if (document.getElementById('passInput').value === "admin777") {
+            const pass = document.getElementById('passInput').value;
+            if (pass === "admin777") { // Твой пароль
                 document.getElementById('login-screen').style.display = 'none';
-                initData();
-            } else alert("Ошибка пароля");
+                loadData();
+            } else {
+                alert("Неверный пароль!");
+            }
         };
 
-        // Проверь, что в initData() именно этот код:
-function initData() {
-    // 1. СЛУШАЕМ ЗАПИСИ (Коллекция appointments)
-    // Мы убрали сложную сортировку, чтобы данные появились в любом случае
-    onSnapshot(collection(db, "appointments"), (snap) => {
-        const list = document.getElementById('apps-list');
-        list.innerHTML = "";
-        
-        if (snap.empty) {
-            list.innerHTML = "<div class='card'>Пока нет ни одной записи 📭</div>";
-            return;
-        }
+        function loadData() {
+            // Слушаем записи
+            onValue(ref(db, 'appointments'), (snapshot) => {
+                const list = document.getElementById('apps-list');
+                list.innerHTML = "";
+                const data = snapshot.val();
+                if (!data) { list.innerHTML = "Записей нет."; return; }
 
-        snap.forEach(d => {
-            const a = d.data();
-            const docId = d.id;
-            
-            // Проверяем наличие полей, чтобы не было ошибок при отрисовке
-            const name = a.name || "Без имени";
-            const date = a.date || "Дата не указана";
-            const hour = a.hour || "??";
-            const phone = a.phone || "Нет телефона";
+                for (let id in data) {
+                    const a = data[id];
+                    list.innerHTML += `
+                        <div class="card">
+                            <b>${a.name || 'Клиент'}</b> — ${a.hour}:00
+                            <div style="font-size:12px; color:666">
+                                📅 ${a.date}<br>📞 ${a.phone}<br>✂️ ${a.services || '-'}
+                            </div>
+                            <button class="btn btn-red" onclick="deleteApp('${id}')">Удалить запись</button>
+                            <button class="btn btn-outline" onclick="banUser('${a.clientId}', '${a.name}')">В БАН</button>
+                        </div>`;
+                }
+            });
 
-            list.innerHTML += `
-                <div class="card">
-                    <div class="card-title">${name} <span>${hour}:00</span></div>
-                    <div class="card-info">
-                        📅 ${date}<br>
-                        📞 ${phone}<br>
-                        ✂️ ${a.services || 'Услуга не выбрана'}<br>
-                        🆔 ID: ${a.clientId || 'Не привязан к ТГ'}
-                    </div>
-                    <input type="number" id="sum-${docId}" class="y-input" placeholder="Сумма оплаты ₽">
-                    <button class="btn btn-black" onclick="finishBooking('${docId}')">Завершить и выдать чек</button>
-                    <div class="btn-row">
-                        <button class="btn btn-outline" onclick="openEdit('${docId}', '${name}', '${date}', ${hour})">Изменить</button>
-                        <button class="btn btn-red" onclick="deleteBooking('${docId}')">Удалить</button>
-                    </div>
-                    <button class="btn btn-red" style="width:100%; margin-top:10px; opacity:0.6;" onclick="banUser('${a.clientId}', '${name}')">В БАН</button>
-                </div>`;
-        });
-    });
-}
+            // Слушаем услуги
+            onValue(ref(db, 'services'), (snapshot) => {
+                const list = document.getElementById('services-list');
+                list.innerHTML = "";
+                const data = snapshot.val();
+                for (let id in data) {
+                    list.innerHTML += `<div class="card" style="display:flex;justify-content:space-between">
+                        ${data[id].name} 
+                        <span style="color:red;cursor:pointer" onclick="removeService('${id}')">✕</span>
+                    </div>`;
+                }
+            });
 
-            // Черный список (Рендеринг вкладки)
-            onSnapshot(collection(db, "blacklist"), (snap) => {
+            // Слушаем ЧС
+            onValue(ref(db, 'blacklist'), (snapshot) => {
                 const list = document.getElementById('black-list');
                 list.innerHTML = "";
-                if(snap.empty) list.innerHTML = "В черном списке пока никого нет.";
-                snap.forEach(d => {
-                    const b = d.data();
-                    list.innerHTML += `
-                        <div class="card" style="border-left: 5px solid var(--red)">
-                            <div class="card-title">${b.name}</div>
-                            <div class="card-info">ID: ${d.id}<br>Дата бана: ${b.date}</div>
-                            <button class="btn btn-outline" style="width:100%; color:var(--red)" onclick="unbanUser('${d.id}')">РАЗБЛОКИРОВАТЬ</button>
-                        </div>`;
-                });
-            });
-
-            // Услуги и Отчеты (как в прошлом коде)
-            onSnapshot(collection(db, "services"), (s) => {
-                const l = document.getElementById('services-list'); l.innerHTML = "";
-                s.forEach(d => l.innerHTML += `<div class="card" style="display:flex; justify-content:space-between"><b>${d.data().name}</b><button class="btn btn-red" style="padding:5px" onclick="deleteService('${d.id}')">✕</button></div>`);
-            });
-            onSnapshot(collection(db, "archive"), (s) => {
-                let t = 0; const l = document.getElementById('archive-list'); l.innerHTML = "";
-                s.forEach(d => { t += Number(d.data().finalPrice); l.innerHTML += `<div class="card" style="font-size:11px">${d.data().name}: ${d.data().finalPrice}₽</div>`});
-                document.getElementById('total-rev').innerText = t + " ₽";
+                const data = snapshot.val();
+                for (let id in data) {
+                    list.innerHTML += `<div class="card">
+                        ${data[id].name} (ID: ${id})
+                        <button class="btn btn-outline" onclick="unbanUser('${id}')">Разбанить</button>
+                    </div>`;
+                }
             });
         }
 
-        // --- ЛОГИКА БАНА ---
-        window.banUser = async (clientId, name) => {
-            if(!clientId || clientId === "undefined") return alert("ID клиента не найден. Бан возможен только для тех, кто писал боту.");
-            if(confirm(`ЗАБАНИТЬ ${name}?`)) {
-                await setDoc(doc(db, "blacklist", clientId), { name, date: new Date().toLocaleDateString() });
-                alert("Клиент заблокирован в боте.");
-            }
+        // ФУНКЦИИ
+        window.deleteApp = (id) => { if(confirm("Удалить?")) remove(ref(db, 'appointments/' + id)); };
+        
+        window.addService = () => {
+            const name = document.getElementById('newService').value;
+            if(name) push(ref(db, 'services'), { name });
+            document.getElementById('newService').value = "";
         };
+        window.removeService = (id) => remove(ref(db, 'services/' + id));
 
-        window.unbanUser = async (id) => {
-            if(confirm("Разблокировать клиента?")) {
-                await deleteDoc(doc(db, "blacklist", id));
-                alert("Доступ восстановлен.");
-            }
+        window.banUser = (uid, name) => {
+            if(!uid || uid === "undefined") return alert("ID не найден. Клиент должен привязать запись в боте.");
+            set(ref(db, 'blacklist/' + uid), { name, date: new Date().toLocaleDateString() });
         };
+        window.unbanUser = (id) => remove(ref(db, 'blacklist/' + id));
 
-        // Остальные функции (сохранение, удаление, оплата)
-        window.finishBooking = async (id) => {
-            const sum = document.getElementById(`sum-${id}`).value;
-            if(!sum) return alert("Введите сумму!");
-            const snap = await getDoc(doc(db, "appointments", id));
-            const data = snap.data();
-            await setDoc(doc(db, "archive", id), { ...data, finalPrice: sum });
-            await deleteDoc(doc(db, "appointments", id));
-            await fetch(PIPEDREAM_URL, { method: "POST", body: JSON.stringify({ action: "complete_order", customerChatId: data.clientId, price: sum }) });
-            alert("Запись завершена!");
-        };
-
-        window.addService = async () => {
-            const n = document.getElementById('newServiceName').value;
-            if(n) { await setDoc(doc(db, "services", "s_"+Date.now()), {name:n}); document.getElementById('newServiceName').value=""; }
-        };
-        window.deleteService = async (id) => { if(confirm("Удалить?")) await deleteDoc(doc(db, "services", id)); };
-        window.deleteBooking = async (id) => { if(confirm("Удалить запись?")) await deleteDoc(doc(db, "appointments", id)); };
-        window.openEdit = (id, n, d, h) => { 
-            document.getElementById('editId').value=id; document.getElementById('editName').value=n;
-            document.getElementById('editDate').value=d; document.getElementById('editHour').value=h;
-            document.getElementById('edit-modal').style.display='flex'; 
-        };
-        window.saveEdit = async () => {
-            const id = document.getElementById('editId').value;
-            await updateDoc(doc(db, "appointments", id), { name: document.getElementById('editName').value, date: document.getElementById('editDate').value, hour: Number(document.getElementById('editHour').value) });
-            document.getElementById('edit-modal').style.display='none';
-        };
-        window.switchTab = (target, el) => {
+        window.switchTab = (tab, el) => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            ['apps', 'services', 'stats', 'black'].forEach(s => document.getElementById('section-' + s).style.display = s === target ? 'block' : 'none');
+            document.getElementById('section-apps').style.display = tab === 'apps' ? 'block' : 'none';
+            document.getElementById('section-services').style.display = tab === 'services' ? 'block' : 'none';
+            document.getElementById('section-black').style.display = tab === 'black' ? 'block' : 'none';
         };
     </script>
 </body>
