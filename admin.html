@@ -116,27 +116,49 @@
             } else alert("Ошибка пароля");
         };
 
-        function initData() {
-            // Записи + Кнопка Бан
-            onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snap) => {
-                const list = document.getElementById('apps-list');
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const a = d.data();
-                    list.innerHTML += `
-                        <div class="card">
-                            <div class="card-title">${a.name} <span>${a.hour}:00</span></div>
-                            <div class="card-info">📞 ${a.phone}<br>📅 ${a.date}<br>✂️ ${a.services || '—'}</div>
-                            <input type="number" id="sum-${d.id}" class="y-input" placeholder="Сумма ₽">
-                            <button class="btn btn-black" onclick="finishBooking('${d.id}')">Завершить</button>
-                            <div class="btn-row">
-                                <button class="btn btn-outline" onclick="openEdit('${d.id}', '${a.name}', '${a.date}', ${a.hour})">Изменить</button>
-                                <button class="btn btn-red" onclick="deleteBooking('${d.id}')">Удалить</button>
-                            </div>
-                            <button class="btn btn-red" style="width:100%; margin-top:10px; opacity:0.8" onclick="banUser('${a.clientId}', '${a.name}')">В БАН</button>
-                        </div>`;
-                });
-            });
+        // Проверь, что в initData() именно этот код:
+function initData() {
+    // 1. СЛУШАЕМ ЗАПИСИ (Коллекция appointments)
+    // Мы убрали сложную сортировку, чтобы данные появились в любом случае
+    onSnapshot(collection(db, "appointments"), (snap) => {
+        const list = document.getElementById('apps-list');
+        list.innerHTML = "";
+        
+        if (snap.empty) {
+            list.innerHTML = "<div class='card'>Пока нет ни одной записи 📭</div>";
+            return;
+        }
+
+        snap.forEach(d => {
+            const a = d.data();
+            const docId = d.id;
+            
+            // Проверяем наличие полей, чтобы не было ошибок при отрисовке
+            const name = a.name || "Без имени";
+            const date = a.date || "Дата не указана";
+            const hour = a.hour || "??";
+            const phone = a.phone || "Нет телефона";
+
+            list.innerHTML += `
+                <div class="card">
+                    <div class="card-title">${name} <span>${hour}:00</span></div>
+                    <div class="card-info">
+                        📅 ${date}<br>
+                        📞 ${phone}<br>
+                        ✂️ ${a.services || 'Услуга не выбрана'}<br>
+                        🆔 ID: ${a.clientId || 'Не привязан к ТГ'}
+                    </div>
+                    <input type="number" id="sum-${docId}" class="y-input" placeholder="Сумма оплаты ₽">
+                    <button class="btn btn-black" onclick="finishBooking('${docId}')">Завершить и выдать чек</button>
+                    <div class="btn-row">
+                        <button class="btn btn-outline" onclick="openEdit('${docId}', '${name}', '${date}', ${hour})">Изменить</button>
+                        <button class="btn btn-red" onclick="deleteBooking('${docId}')">Удалить</button>
+                    </div>
+                    <button class="btn btn-red" style="width:100%; margin-top:10px; opacity:0.6;" onclick="banUser('${a.clientId}', '${name}')">В БАН</button>
+                </div>`;
+        });
+    });
+}
 
             // Черный список (Рендеринг вкладки)
             onSnapshot(collection(db, "blacklist"), (snap) => {
